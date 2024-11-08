@@ -1,0 +1,111 @@
+.secao, #div_logo, #lista {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+#secao_um {
+    border-bottom: 4px solid black;
+    background-color: lightgray;
+}
+
+#telefone, #div_logo {
+    margin: auto 2vw;
+}
+
+#telefone {
+    font-family: 'Montserrat', sans-serif;
+}
+
+#logo_dragao {
+    width: 50px;
+}
+
+#cutelaria {
+    margin: auto 0;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+#nav_lista {
+    margin: auto 0;
+}
+
+.lista-li {
+    margin: 1vw;
+}
+
+
+.lista-li a {
+    color: rgb(100, 100, 100);
+    padding: 1vw;
+    transition:  0.8s;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.lista-li a:hover {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#menu_opcao {
+    display: none;
+    position: relative;
+}
+
+#menu_opcao ul {
+    padding-top: 1vw;
+    position: absolute;
+}
+
+#menu_opcao ul li {
+    padding: 1.5vw 0;
+    background-color: white;
+    border-bottom: 1px solid lightgray;
+}
+
+
+
+#li_menu:hover + #menu_opcao {
+    display: block;
+}
+
+#secao_dois {
+    margin: 2vw 10vw;
+}
+
+#nav_secao_dois {
+    text-align: left;
+    width: 40%;
+    font-family: 'Montserrat', sans-serif;
+}
+
+#nav_secao_dois h1 {
+    font-size: 25px;
+    padding-bottom: 3vw;
+}
+
+#nav_secao_dois h3 {
+    font-size: 15px;
+    padding-bottom: 1.2vw;
+}
+
+#nav_secao_dois p {
+    font-size: 12px;
+    padding-bottom: 1.2vw;
+}
+
+#nav_secao_dois button {
+    border: none;
+    background-color: grey;
+    color: white;
+    font-weight: bold;
+    padding: 1vw;
+}
+
+#video {
+    width: 50%;
+    height: 25vw;
+}
