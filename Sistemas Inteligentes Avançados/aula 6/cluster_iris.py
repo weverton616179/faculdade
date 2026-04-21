@@ -1,0 +1,105 @@
+#SISTEMAS INTELITGENTES
+#Modelos não supervisionados
+#Base iris
+
+#Imports
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+import pickle
+
+#1. Abrir os dados
+dados = pd.read_csv('C:/Users/wever/OneDrive/Área de Trabalho/faculdade/faculdade/Sistemas Inteligentes Avançados/aula 6/iris.csv', sep= ';')
+
+#2. Normalizar os dados
+#2.1 Separar atributos numéricos e atributos categóricos
+dados_num = dados.drop(columns=['class'])
+dados_cat = dados['class']
+
+#2.2 Normalizar os dados numéricos
+# -- Instanciar o normalizador
+scaler = MinMaxScaler()
+# -- Treinar o normalizador
+normalizador = scaler.fit(dados_num)
+# -- Salvar o normalizador para uso posterior
+pickle.dump(normalizador, open('normalizador_iris.pkl', 'wb'))
+# -- normalizar os dados
+dados_num_norm = normalizador.fit_transform(dados_num)
+
+#2.3 Normalizar os dados categóricos
+dados_cat_norm = pd.get_dummies(dados_cat, prefix_sep='_', dtype=int)
+
+#2.4 Reagrupas os objetos normalizados em um data frame
+#---- Converter a matriz numérica (dados_num_norm) em dataframe
+dados_num_norm = pd.DataFrame(dados_num_norm, columns = dados_num.columns)
+
+# --  juntar o dados_num_norm com o dados_cat_norm
+dados_norm = dados_num_norm.join(dados_cat_norm)
+# print(dados_norm.columns)
+
+#3. HIPERPARAMETRIZAR  
+#Vamos determinar o número ótimo de clusters antes do treinamento
+# W -- Cluster é a mesma coisa que grupos
+from sklearn.cluster import KMeans #Kmeans é um clusterizador
+import math
+import matplotlib.pyplot as plt
+from scipy.spatial.distance import cdist #método para cálculo de distâncias cartesianas
+import numpy as np
+
+# W -- Método do cotovelo (Elbow Method), serve para determinar o número ótimo de clusters
+
+distortions=[] #Matriz para armazenar as distorçoes
+K = range(1, dados.shape[0])
+
+for i in K:
+    # W -- Em n_clusters tenta criar i clusters/grupos
+    # W -- random_state=42 é algo parecido com uma seed, e para garantir que o resultado seja sempre o mesmo, estamos usando sempre a mesma seed
+    # W -- .fit(dados_norm) treina o modelo com os dados normalizados
+    cluster_model = KMeans(n_clusters=i, random_state=42).fit(dados_norm)
+
+    #calcular e armazenar a distorção de cada treinamento
+    distortions.append(
+        sum(
+            np.min(
+                cdist(dados_norm,
+                      cluster_model.cluster_centers_,
+                      'euclidean'), axis=1)/dados_norm.shape[0] 
+            )
+        )
+
+# W -- código comentado gera um gráfico para ilustar com a matriz distortions x K
+# W -- pelo que foi visto no grafico o número ótimo de clusters é 3
+
+#cria o gráfico para ilustar com a matriz distortions x K
+# fig, ax = plt.subplots()
+# ax.plot(K, distortions)
+# ax.set(xlabel='n Clusters', ylabel='Distorcoes')
+# ax.grid()
+# plt.show()
+    
+#Determinar o número ótimo de cluster para o modelo
+x0 = K[0]
+y0 = distortions[0]
+xn = K[-1]    
+yn = distortions[-1]
+distances = []
+for i in range(len(distortions)):
+    x = K[i]
+    y = distortions[i]
+    numerador = abs(
+        (yn-y0)*x - (xn-x0)*y + xn*y0 - yn*x0
+    )
+    denominador = math.sqrt(
+        (yn-y0)**2 + (xn-x0)**2
+    )
+    distances.append(numerador/denominador)
+
+numero_clusters_otimo = K[distances.index(np.max(distances))]
+
+#Treinar o modelo com o número ótimo
+cluster_model = KMeans(
+                        n_clusters= numero_clusters_otimo,
+                        random_state= 42).fit(dados_norm)
+
+#Salvar o modelo para uso posterior
+pickle.dump(cluster_model, open('cluster_iris.pkl', 'wb'))
+
