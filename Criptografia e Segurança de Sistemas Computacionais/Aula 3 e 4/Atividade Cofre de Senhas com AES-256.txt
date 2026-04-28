@@ -1,0 +1,69 @@
+Objetivo:
+
+Implementar um programa simples que cifra e decifra arquivos usando o AES-256 implementado pelos alunos, aplicando conceitos de derivação de chave e modo de operação seguro.
+
+ 
+
+1. Requisitos Mínimos
+
+a) Cifrar um arquivo
+
+Comando:
+
+./cofre cifrar mensagem.txt
+
+- Solicita uma senha ao usuário
+
+- Deriva uma chave AES-256 usando PBKDF2
+
+- Cifra o conteúdo do arquivo usando AES-256
+
+- Salva em um novo arquivo: mensagem.txt.cifrado
+
+- O arquivo cifrado deve conter: [salt] + [IV] + [ciphertext]
+
+ 
+
+b) Decifrar um arquivo
+
+Comando:
+
+./cofre decifrar mensagem.txt.cifrado
+
+- Solicita a senha
+
+- Extrai o sal e o IV do arquivo
+
+- Deriva a mesma chave
+
+- Decifra e exibe o conteúdo original
+
+ 
+
+c) Testar com vetor conhecido
+
+Comando:
+
+./cofre testar
+
+- Executa automaticamente um teste com o vetor do NIST
+
+- Exibe "SUCESSO" ou "FALHA" para cada teste
+
+ 
+
+2. Especificações Técnicas
+
+Algoritmo: AES-256 (implementado pelo aluno)
+
+Modo de operação: CBC
+
+Tamanho do bloco: 16 bytes
+
+Derivação de chave: PBKDF2-HMAC-SHA256, 100.000 iterações
+
+Salt: 16 bytes, gerado aleatoriamente a cada cifragem
+
+IV: 16 bytes, gerado aleatoriamente a cada cifragem
+
+Formato do arquivo cifrado: [sal(16)] [IV(16)] [ciphertext]
