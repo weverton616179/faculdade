@@ -1,0 +1,15 @@
+QUAL É O PRÓXIMO PASSO?
+
+Caso tenha algum problema com o produto, você pode fazer uma solicitação de devolução em até 7 dias após a entrega do pedido.
+
+Após o pagamento de produtos digitais, como o Vale Presente Shopee, Gift Cards, Pacotes de Cupons, entre outros, não será possível solicitar o reembolso.
+
+Saiba mais sobre devolução e reembolsos aqui.
+
+Esperamos que a sua experiência tenha sido ótima!
+
+Abraços,
+Shopee Brasil
+
+python cofre.py decifrar coisa.txt.cifrado
+python cofre.py cifrar coisa.txt
