@@ -1,0 +1,104 @@
+Sistema de Gerenciamento de Eventos Críticos de uma Cidade Inteligente
+
+
+Uma cidade inteligente monitora, em tempo real, eventos críticos urbanos, como:
+
+Acidentes de trânsito
+Falhas em semáforos
+Interrupções de energia
+Alagamentos
+Incêndios
+
+
+Cada evento possui um nível de severidade, timestamp, localização, e status.
+
+
+
+O sistema precisa registrar, consultar, priorizar e encerrar eventos de forma eficiente, garantindo tempo de resposta rápido mesmo com grande volume de dados.
+
+
+
+Para isso, o núcleo do sistema deve ser implementado utilizando uma Árvore AVL, garantindo operações eficientes.
+
+
+
+Estrutura de Dados Principal (Árvore AVL)
+
+
+Cada nó da Árvore AVL representará um evento crítico.
+
+Estrutura mínima do nó:
+ID do Evento (int) → chave primária da AVL
+Tipo do Evento (enum ou string)
+Nível de Severidade (int de 1 a 5)
+Data/Hora do Registro (struct)
+Região da Cidade (string)
+Status (Ativo ou Resolvido)
+Altura do nó (int)
+Ponteiro esquerdo
+Ponteiro direito
+🔑 Critério de ordenação principal:
+
+→ ID do Evento
+
+
+
+Funcionalidades Obrigatórias
+a) Gerenciamento da Árvore AVL
+Inserção de eventos com:
+Cálculo do fator de balanceamento
+Aplicação de rotações simples e duplas
+Remoção de eventos:
+Apenas eventos com status Resolvido podem ser removidos
+Rebalanceamento obrigatório após remoção
+Busca de evento por ID
+b) Consultas Avançadas
+Implemente consultas que não se resolvem apenas com busca simples:
+
+Listagem de eventos ativos por intervalo de severidade
+Ex.: Severidade entre 3 e 5
+Deve percorrer a árvore de forma eficiente
+Relatório por região
+Exibir todos os eventos ativos de uma região específica
+Ordenados por ID (via percurso em-ordem)
+Busca por intervalo de ID
+Listar eventos cujo ID esteja entre X e Y
+c) Operações de Atualização
+Alterar o status de um evento (Ativo → Resolvido)
+Atualizar severidade de um evento ativo
+Essas operações não podem quebrar a consistência da árvore
+d) Métricas da Árvore
+O sistema deve calcular:
+
+Altura total da árvore
+Número total de nós
+Número de eventos ativos
+Fator de balanceamento médio da árvore
+Quantidade total de rotações realizadas desde o início da execução
+
+
+Interface do Sistema
+Menu textual interativo
+Submenus organizados (Ex.: Cadastros, Consultas, Relatórios)
+Validação de entradas inválidas
+Execução contínua até opção de saída
+
+
+Requisitos Técnicos
+Linguagem: C
+Uso obrigatório de:
+Alocação dinâmica de memória
+struct, enum, ponteiros
+Proibido:
+Uso de bibliotecas prontas de árvores
+Uso de listas ou vetores para substituir a árvore
+
+
+Entregáveis
+Código-fonte completo com comentários (0,3 pts)
+Todas as funcionalidades implementadas (0,5 pts)
+README com:
+Instruções de compilação (0,2 pts)
+Descrição geral do sistema (0,3 pts)
+Relatório técnico contendo:
+Capturas de testes realizados (0,2 pts)
