@@ -2,6 +2,8 @@
 #Modelos não supervisionados
 #Base iris
 
+# W -- este arquivo tem como objetivo criar um modelo de clusterização (separa por grupos) e normalização (transforma os dados em uma escala de 0 a 1) para a base iris
+
 #Imports
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -79,12 +81,12 @@ for i in K:
 #Determinar o número ótimo de cluster para o modelo
 x0 = K[0]
 y0 = distortions[0]
-xn = K[-1]    
-yn = distortions[-1]
+xn = K[-1] # W -- último elemento de K
+yn = distortions[-1] # W -- último elemento de distortions
 distances = []
 for i in range(len(distortions)):
-    x = K[i]
-    y = distortions[i]
+    x = K[i] # W -- elemento atual de K
+    y = distortions[i] # W -- elemento atual de distortions
     numerador = abs(
         (yn-y0)*x - (xn-x0)*y + xn*y0 - yn*x0
     )
@@ -94,6 +96,7 @@ for i in range(len(distortions)):
     distances.append(numerador/denominador)
 
 numero_clusters_otimo = K[distances.index(np.max(distances))]
+print("Número ótimo de clusters: ", numero_clusters_otimo)
 
 #Treinar o modelo com o número ótimo
 cluster_model = KMeans(

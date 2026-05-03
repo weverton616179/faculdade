@@ -1,0 +1,5 @@
+1.Implemente uma função para codificar e decodificar uma string para Base4
+
+   1.1.Receba uma string e retorne a string codificada
+
+   1.2.Receba uma string codificada e retorne seu conteúdo legível
