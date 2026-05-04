@@ -10,6 +10,8 @@ int max(int a, int b) {
     return (a > b) ? a : b;
 }
 
+// Retorna a altura de um no
+// Se o no for nulo, a altura e considerada 0
 int getAltura(Node *N) {
     if (N == NULL)
         return 0;
@@ -17,6 +19,7 @@ int getAltura(Node *N) {
 }
 
 
+// Cria e inicializa um novo no da arvore AVL com os dados do evento
 Node* novoNo(Evento evento) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->evento = evento;
@@ -26,6 +29,7 @@ Node* novoNo(Evento evento) {
     return node;
 }
 
+// Realiza uma rotacao simples a direita para balancear a arvore
 Node *rotacaoDireita(Node *y) {
     total_rotacoes++;
     Node *x = y->esquerda;
@@ -40,6 +44,7 @@ Node *rotacaoDireita(Node *y) {
     return x;
 }
 
+// Realiza uma rotacao simples a esquerda para balancear a arvore
 Node *rotacaoEsquerda(Node *x) {
     total_rotacoes++;
     Node *y = x->direita;
@@ -54,12 +59,16 @@ Node *rotacaoEsquerda(Node *x) {
     return y;
 }
 
+// Calcula o fator de balanceamento de um no (altura da subarvore esquerda menos a direita)
+// Um fator fora do intervalo [-1, 1] indica que a arvore esta desbalanceada
 int getBalanceamento(Node *N) {
     if (N == NULL)
         return 0;
     return getAltura(N->esquerda) - getAltura(N->direita);
 }
 
+// Insere recursivamente um novo evento na arvore AVL
+// Tambem atualiza a altura dos nos ancestrais e rebalanceia a arvore se necessario
 Node* inserir(Node* node, Evento evento) {
     if (node == NULL)
         return novoNo(evento);
@@ -94,6 +103,7 @@ Node* inserir(Node* node, Evento evento) {
     return node;
 }
 
+// Busca recursivamente um evento na arvore atraves do seu ID
 Node* buscar(Node* root, int id) {
     if (root == NULL)
         return NULL;
@@ -106,6 +116,8 @@ Node* buscar(Node* root, int id) {
     return root;
 }
 
+// Encontra o no com o menor valor (mais a esquerda) de uma subarvore
+// Funcao auxiliar utilizada durante a remocao de um no com dois filhos
 Node* noMenorValor(Node* node) {
     Node* atual = node;
     while (atual->esquerda != NULL)
@@ -113,6 +125,7 @@ Node* noMenorValor(Node* node) {
     return atual;
 }
 
+// Remove recursivamente um evento pelo ID e rebalanceia a arvore AVL
 Node* remover(Node* root, int id) {
     if (root == NULL)
         return root;
@@ -164,6 +177,7 @@ Node* remover(Node* root, int id) {
     return root;
 }
 
+// Imprime os detalhes de um evento de forma formatada
 void imprimirEvento(Evento e) {
     const char* tipos[] = {"Acidente", "Semaforo", "Energia", "Alagamento", "Incendio"};
     const char* statuses[] = {"Ativo", "Resolvido"};
@@ -172,6 +186,7 @@ void imprimirEvento(Evento e) {
            e.dataHora.dia, e.dataHora.mes, e.dataHora.ano, e.dataHora.hora, e.dataHora.minuto);
 }
 
+// Percorre a arvore para listar os eventos ativos cuja severidade esteja no intervalo [min, max]
 void listarAtivosPorSeveridade(Node* root, int min, int max) {
     if (root != NULL) {
         listarAtivosPorSeveridade(root->esquerda, min, max);
@@ -182,6 +197,8 @@ void listarAtivosPorSeveridade(Node* root, int min, int max) {
     }
 }
 
+// Percorre a arvore em-ordem para listar os eventos ativos de uma regiao especifica
+// O percurso em-ordem garante que os eventos sejam exibidos ordenados por ID
 void listarAtivosPorRegiao(Node* root, const char* regiao) {
     if (root != NULL) {
         listarAtivosPorRegiao(root->esquerda, regiao);
@@ -192,6 +209,8 @@ void listarAtivosPorRegiao(Node* root, const char* regiao) {
     }
 }
 
+// Busca eficiente na arvore (aproveitando as propriedades da arvore de busca binaria)
+// para listar eventos cujo ID esteja dentro do intervalo [minID, maxID]
 void listarPorIntervaloID(Node* root, int minID, int maxID) {
     if (root != NULL) {
         if (minID < root->evento.id) 
@@ -205,28 +224,33 @@ void listarPorIntervaloID(Node* root, int minID, int maxID) {
     }
 }
 
+// Conta recursivamente o numero total de nos na arvore
 int contarNos(Node* root) {
     if (root == NULL) return 0;
     return 1 + contarNos(root->esquerda) + contarNos(root->direita);
 }
 
+// Conta recursivamente quantos eventos na arvore possuem o status ATIVO
 int contarAtivos(Node* root) {
     if (root == NULL) return 0;
     int count = (root->evento.status == ATIVO) ? 1 : 0;
     return count + contarAtivos(root->esquerda) + contarAtivos(root->direita);
 }
 
+// Soma os fatores de balanceamento de todos os nos (usado para calcular a media)
 int somarBalanceamentos(Node* root) {
     if (root == NULL) return 0;
     return getBalanceamento(root) + somarBalanceamentos(root->esquerda) + somarBalanceamentos(root->direita);
 }
 
+// Calcula o fator de balanceamento medio da arvore inteira
 float fatorBalanceamentoMedio(Node* root) {
     int totalNos = contarNos(root);
     if (totalNos == 0) return 0.0;
     return (float)somarBalanceamentos(root) / totalNos;
 }
 
+// Libera toda a memoria alocada para os nos da arvore (percurso pos-ordem)
 void liberarArvore(Node* root) {
     if (root != NULL) {
         liberarArvore(root->esquerda);
