@@ -1,0 +1,40 @@
+bits = menor unidade de medida computacional (0 ou 1)
+bytes = conjunto de bits (normalmente 6 ou 8), usados para representar um numero ou caractere
+
+AES é simétrico, mesma chave que embaralha desembaralha
+AES 256 tem este nome pois a chave tem 256 bits (32 bytes)
+AES divide a informação em blocos de 128 bits (16 bytes) e as coloca em uma matriz de 4x4 bytes (chamada state)
+
+cada bloco passa por um loop (chamado round), com a chave 256, que executa 14 rodadas de transformação matemática
+
+passo a passo:
+
+1 - com base na chave de 32 bytes é criado 15 subchaves de 16 bytes através de um algoritimo de expansão, sendo uma chave para o inicio, e as outras para cada um dos 14 loops (round)
+
+2. Adição da Chave Inicial (AddRoundKey)
+O bloco de 16 bytes em texto plano sofre uma operação lógica XOR bit a bit (^) com a primeira sub-chave.
+
+3. As 13 Rodadas Principais
+A matriz 4x4 passa por um loop de 13 iterações. Em cada iteração, ela sofre 4 transformações estritas:
+
+SubBytes (Confusão): Cada byte da matriz é substituído por um byte diferente usando uma tabela de pesquisa predefinida (chamada S-box). Se você tem o byte 0x19, ele olha na tabela e troca por 0xd4. Isso destrói padrões lógicos no texto original.
+
+ShiftRows (Difusão): As linhas da matriz são deslocadas para a esquerda. A 1ª linha não se move. A 2ª linha move 1 posição. A 3ª move 2 posições, etc. Isso mistura os dados horizontalmente.
+
+MixColumns (Alta Difusão): As colunas da matriz sofrem uma multiplicação de matrizes usando matemática complexa (Campos de Galois). Isso garante que, se você mudar 1 bit no texto original, mais da metade do texto cifrado mudará completamente no final (Efeito Avalanche).
+
+AddRoundKey: O resultado disso sofre um XOR com a sub-chave específica daquela rodada.
+
+4. A 14ª Rodada Final
+Na última rodada, o AES executa o SubBytes, ShiftRows e AddRoundKey, pulando o MixColumns. O resultado dessa rodada final é o seu Texto Cifrado (Ciphertext).
+
+Para descriptografar, o AES executa essas funções de trás para frente usando as operações inversas (Inverse SubBytes, Inverse ShiftRows, etc.).
+
+Na vida real, nós nunca usamos o AES "puro" (chamado modo ECB). Como o AES só embaralha blocos exatos de 16 bytes, se você criptografar uma imagem que tem vários blocos de 16 bytes idênticos (como um céu azul), o texto cifrado também terá blocos idênticos, revelando padrões.
+
+Para resolver isso, usamos Modos de Operação, que injetam aleatoriedade no processo. Hoje, o padrão ouro na indústria é o AES-256-GCM.
+O GCM (Galois/Counter Mode) faz duas coisas:
+
+Criptografa com segurança (usando um "vetor de inicialização" para que a mesma mensagem criptografada duas vezes gere resultados diferentes).
+
+Autentica os dados, garantindo que ninguém alterou o texto cifrado no meio do caminho.

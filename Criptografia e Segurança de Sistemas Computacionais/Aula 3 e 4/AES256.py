@@ -6,8 +6,6 @@ com preenchimento (padding) PKCS#7.
 Nomes de variáveis foram simplificados e comentários detalhados foram adicionados para facilitar o entendimento.
 """
 
-import os
-
 # S-box (Tabela de substituição)
 # É uma tabela de pesquisa usada para trocar os bytes, adicionando "confusão" aos dados.
 # Isso impede que padrões nos dados de entrada apareçam nos dados de saída.
