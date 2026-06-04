@@ -1,0 +1,4 @@
+Treinar uma random forest
+Utilize a base Bank, a partir deste link:
+
+https://archive.ics.uci.edu/dataset/222/bank+marketing

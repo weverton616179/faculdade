@@ -1,0 +1,9 @@
+Classificador com a base Pima Diabetes
+Link para a base: https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database
+
+Treine e avalie a acurácia de 3 modelos
+
+1 - Random Forests
+2 - Support Vector Machine
+3 - Um classificado a sua escolha
+Compare a acurácia detalhadamente e indique qual modelo é mais adequado para entrar em produção

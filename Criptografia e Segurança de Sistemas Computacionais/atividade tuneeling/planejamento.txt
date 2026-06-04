@@ -1,0 +1,52 @@
+# Planejamento: Sistema de Chat com Criptografia Assimétrica (Tunneling)
+
+## 1. Requisitos Finais do Sistema
+* **Arquitetura:** Duas aplicações em Python (podem agir como Cliente e Servidor para estabelecer a conexão, mas funcionarão de forma simétrica no chat).
+* **Interface:** CLI (Interface de Linha de Comando) ou terminal simples.
+* **Comunicação:** Troca de mensagens de texto bidirecional em tempo real.
+* **Segurança (Core):** * Geração de um par de chaves assimétricas (Pública e Privada) para cada aplicação ao iniciar.
+  * Troca (Handshake) das chaves públicas logo após a conexão estabelecida.
+  * Envio de mensagens criptografadas com a chave pública do destinatário.
+  * Recebimento de mensagens descriptografadas usando a própria chave privada.
+
+## 2. Tecnologias e Bibliotecas Utilizadas
+* **`socket` (Nativa do Python):** Para estabelecer a conexão TCP/IP entre as duas aplicações e trafegar os bytes de informação.
+* **`threading` (Nativa do Python):** Para rodar duas tarefas simultâneas em cada aplicação: uma thread esperando/recebendo mensagens e outra livre para o usuário digitar novas mensagens.
+* **`rsa` (Biblioteca externa simples):** Excelente para fins educacionais. Facilita a geração de chaves e os métodos de `.encrypt()` e `.decrypt()`. 
+  * *Instalação:* `pip install rsa`
+
+## 3. Estrutura e Organização do Projeto
+Para manter tudo limpo, divida o projeto em três arquivos principais:
+
+* `crypto_utils.py`: Conterá as funções isoladas para gerar chaves, criptografar e descriptografar. Isso mantém a lógica de segurança desacoplada da rede.
+* `server_app.py`: Aplicação 1 (Aguardará a conexão).
+* `client_app.py`: Aplicação 2 (Iniciará a conexão até a Aplicação 1).
+
+*Nota: Após a conexão, os dois arquivos terão lógicas quase idênticas de envio e recebimento.*
+
+## 4. Passo a Passo da Implementação
+
+### Fase 1: O "Esqueleto" da Comunicação (Sockets Limpos)
+1. Crie o `server_app.py` que abre um socket, faz o `bind` em um IP (`localhost`) e Porta (ex: `5000`), e escuta conexões.
+2. Crie o `client_app.py` que conecta nesse IP e Porta.
+3. Implemente as `Threads`: Assim que conectarem, cada aplicação inicia uma thread que fica presa em um loop `while True` esperando mensagens (`recv`), enquanto o fluxo principal fica em um loop pedindo `input()` do usuário.
+4. Teste enviando mensagens em texto plano para garantir que o chat funciona sem criptografia.
+
+### Fase 2: Módulo de Criptografia
+1. No arquivo `crypto_utils.py`, crie uma função que gere o par de chaves: `rsa.newkeys(1024)`. O tamanho 1024 ou 2048 bits é suficiente para o trabalho.
+2. Crie funções de suporte para serializar as chaves públicas (transformar a chave em `bytes` para poder enviá-la pelo socket).
+
+### Fase 3: O Handshake (Troca de Chaves)
+1. Modifique o início do `server_app.py` e `client_app.py`. Antes de abrir o chat para o usuário, as aplicações devem:
+   * Gerar seus próprios pares de chaves.
+   * Enviar a sua **Chave Pública** (em formato de bytes) pela rede.
+   * Receber a **Chave Pública** do parceiro e reconstruí-la na memória.
+2. Imprima na tela um aviso: *"Handshake concluído. Chaves públicas trocadas com sucesso!"* para mostrar ao professor que esta etapa ocorreu.
+
+### Fase 4: Aplicando o "Tunneling" no Chat
+1. No fluxo de envio de mensagens: Antes de dar o `socket.send()`, pegue o texto digitado, converta para bytes e **criptografe usando a chave pública do parceiro**.
+2. No fluxo de recebimento (dentro da Thread): Ao dar o `socket.recv()`, pegue os bytes embaralhados recebidos e **descriptografe usando a sua própria chave privada**.
+3. Imprima a mensagem limpa na tela. Para efeito de demonstração para a matéria, pode ser interessante imprimir no console a mensagem "cifrada" antes de limpá-la, só para comprovar o funcionamento.
+
+## 5. Dica de Ouro (Criptografia na Prática)
+Apenas para o seu conhecimento: na vida real, o RSA puro não é usado para criptografar longas mensagens de texto porque é lento computacionalmente e tem limite de tamanho. Na prática, usamos RSA para trocar uma "Chave Simétrica" (AES) e depois usamos o AES para o chat. Como este é um trabalho acadêmico inicial, criptografar direto com RSA é totalmente aceitável e foca exatamente no comportamento das chaves assimétricas exigido no enunciado.

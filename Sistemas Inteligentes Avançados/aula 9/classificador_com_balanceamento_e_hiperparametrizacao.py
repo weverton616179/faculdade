@@ -8,6 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
 from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import cross_validate #para avaliação cruzada da acurácia do modelo
 import matplotlib.pyplot as plt
 from pickle import load, dump
 from imblearn.over_sampling import SMOTE #Para balancear os dados
@@ -32,7 +33,7 @@ dados.columns #utilizar os rótulos das colunas
 
 #=======================
 #segmentar os dados em dados para treinamento e dados para teste
-atributos_train, atributos_teste, classe_train,classe_test = train_test_split(atributos_b,classes_b, test_size=0.3)
+# atributos_train, atributos_teste, classe_train,classe_test = train_test_split(atributos_b,classes_b, test_size=0.3)
 
 
 #TREINAR O MODELO
@@ -64,7 +65,7 @@ rf_hyperparameters = RandomizedSearchCV(
     verbose=2,
     n_jobs=-1
 )
-rf_hyperparameters.fit(dados_atributos, dados_classe)
+rf_hyperparameters.fit(atributos_b, classes_b)
 #Mostrar o resultado da hiperparametrização
 from pprint import pprint
 print('Melhores parametros:')
@@ -72,51 +73,68 @@ pprint(rf_hyperparameters.best_params_)
 #instanciar o estimador
 rf = RandomForestClassifier(**rf_hyperparameters.best_params_)
 
+#Iniciar a avaliação cruzada da acurácia do modelo
+#definir a estratégia de avaliação (indicadores)
+scoring = ['accuracy', 'f1_macro', 'precision', 'recall']
+scores_cross = cross_validate(
+                            rf,
+                            atributos_b, 
+                            classes_b,
+                            scoring=scoring,
+                            n_jobs=-1,
+                            cv =10,
+                            verbose =1
+)
 
-# fertility_tree = tree.fit(atributos_train, classe_train)
-fertility_rf = rf.fit(atributos_train, classe_train)
+#Mostrar os indicadores
+print('Resultado do cross vall:', scores_cross)
+print('Acurácia:', scores_cross['test_accuracy'].mean())
+print('Precision:', scores_cross['test_precision'].mean())
+print('Recall:', scores_cross['test_recall'].mean())
+print('F1 Score:', scores_cross['test_f1_macro'].mean())
+
+
+fertility_rf = rf.fit(atributos_b, classes_b)
 # #Salvar o modelo
-# dump(fertility_tree, 
-#      open('fertilty_tree.pkl', 'wb'))
 
 dump(fertility_rf, 
      open('fertilty_rf.pkl', 'wb'))
 
-# #Testando o modelo
-# diagnostico_predito = \
-#     fertility_tree.predict(atributos_teste)
+# # #Testando o modelo
+# # diagnostico_predito = \
+# #     fertility_tree.predict(atributos_teste)
 
-diagnostico_predito_rf = \
-    fertility_rf.predict(atributos_teste)
+# diagnostico_predito_rf = \
+#     fertility_rf.predict(atributos_teste)
 
-# #Acurácia geral
-# acuracia = accuracy_score(classe_test, diagnostico_predito)
-# print('acurácia (tree):', acuracia)
-acuracia = accuracy_score(classe_test, diagnostico_predito_rf)
-print('acurácia (rf):', acuracia)
-#Calcular especificidade e sensibilidade
-tn, fp, fn, tp = confusion_matrix(classe_test, diagnostico_predito_rf).ravel()
-#especificidade = vn/(vn+fp)
-especificidade = tn/(tn+fp)
-
-#sensibilidade = vp/(vp+fn)
-sensibilidade = tp/(tp+fn)
-
-print('especificidade (rf): ', especificidade)
-print('sensibiliade: (rf)', sensibilidade)
-# #Matriz de contingência
-# # ConfusionMatrixDisplay.from_estimator(fertility_tree,atributos_teste, classe_test)
-# # plt.show()
-
+# # #Acurácia geral
+# # acuracia = accuracy_score(classe_test, diagnostico_predito)
+# # print('acurácia (tree):', acuracia)
+# acuracia = accuracy_score(classe_test, diagnostico_predito_rf)
+# print('acurácia (rf):', acuracia)
 # #Calcular especificidade e sensibilidade
-# tn, fp, fn, tp = confusion_matrix(classe_test, diagnostico_predito).ravel()
+# tn, fp, fn, tp = confusion_matrix(classe_test, diagnostico_predito_rf).ravel()
 # #especificidade = vn/(vn+fp)
 # especificidade = tn/(tn+fp)
 
 # #sensibilidade = vp/(vp+fn)
 # sensibilidade = tp/(tp+fn)
 
-# print('especificidade (tree): ', especificidade)
-# print('sensibiliade: (tree)', sensibilidade)
+# print('especificidade (rf): ', especificidade)
+# print('sensibiliade: (rf)', sensibilidade)
+# # #Matriz de contingência
+# # # ConfusionMatrixDisplay.from_estimator(fertility_tree,atributos_teste, classe_test)
+# # # plt.show()
+
+# # #Calcular especificidade e sensibilidade
+# # tn, fp, fn, tp = confusion_matrix(classe_test, diagnostico_predito).ravel()
+# # #especificidade = vn/(vn+fp)
+# # especificidade = tn/(tn+fp)
+
+# # #sensibilidade = vp/(vp+fn)
+# # sensibilidade = tp/(tp+fn)
+
+# # print('especificidade (tree): ', especificidade)
+# # print('sensibiliade: (tree)', sensibilidade)
 
 
