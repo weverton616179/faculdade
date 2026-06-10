@@ -1,0 +1,142 @@
+Vamos estruturar um algoritmo SHA-256 puro, usando apenas bibliotecas nativas do Python. O planejamento segue a especificação do NIST (FIPS 180-4) e organiza o código em um único arquivo reutilizável, com uma classe que encapsula todo o processo. A ideia é que você possa copiar esse arquivo para qualquer projeto e usar sha256.SHA256() como se fosse a interface da hashlib.
+
+Arquivo único: sha256.py
+
+Dentro dele, crie a classe SHA256. Toda a lógica fica nela. Você também pode definir as constantes como atributos de classe ou variáveis de módulo (recomendo como atributos de classe).
+
+---
+
+Estrutura da classe SHA256 (métodos e responsabilidades)
+
+1. __init__(self)
+
+O que faz:
+Inicializa o estado interno com os valores hash iniciais padronizados (H0 a H7, cada um com 32 bits). Também zera o contador de bits da mensagem e prepara um buffer interno para armazenar bytes recebidos que ainda não completam um bloco de 512 bits.
+
+Retorno: None
+
+---
+
+2. Métodos auxiliares de operações bit‑a‑bit (32 bits)
+
+Todos os métodos abaixo trabalham com inteiros de 32 bits sem sinal. O Python não tem tipo nativo de 32 bits, então você vai usar & 0xFFFFFFFF para manter os valores nesse intervalo após cada operação.
+
+· _rotr(x, n) – rotação circular à direita.
+    Retorna: int (32 bits)
+    · _right_shift(x, n) – deslocamento lógico à direita (preenche com zeros).
+        Retorna: int (32 bits)
+        · _ch(x, y, z) – função “choose”: (x & y) ^ (~x & z).
+            Retorna: int (32 bits)
+            · _maj(x, y, z) – função “majority”: (x & y) ^ (x & z) ^ (y & z).
+                Retorna: int (32 bits)
+                · _sigma0(x) – operação σ₀ minúsculo (usada na expansão da mensagem).
+                    Retorna: int (32 bits)
+                    · _sigma1(x) – operação σ₁ minúsculo (expansão da mensagem).
+                        Retorna: int (32 bits)
+                        · _Sigma0(x) – operação Σ₀ maiúsculo (rodada de compressão).
+                            Retorna: int (32 bits)
+                            · _Sigma1(x) – operação Σ₁ maiúsculo (rodada de compressão).
+                                Retorna: int (32 bits)
+
+                                ---
+
+                                3. Constantes da classe
+
+                                Defina como listas (ou tuplas) de 64 inteiros de 32 bits:
+
+                                · K – as 64 constantes de rodada, extraídas da parte fracionária das raízes cúbicas dos primeiros 64 primos.
+                                · H_INITIAL – os 8 valores iniciais do hash, extraídos da parte fracionária das raízes quadradas dos primeiros 8 primos.
+
+                                Você pode armazená‑las diretamente como números decimais (em hexa, p.ex.) no código.
+
+                                ---
+
+                                4. _process_block(self, block: bytes)
+
+                                O que faz:
+                                Processa um bloco de exatamente 64 bytes (512 bits).
+
+                                1. Converte os 64 bytes em 16 palavras de 32 bits (big-endian) → array W[0..15].
+                                2. Expande W para 64 palavras (W[16..63]) usando as funções _sigma1, _sigma0 e os valores anteriores.
+                                3. Inicializa oito variáveis de trabalho (a..h) com o estado atual (H0..H7).
+                                4. Executa 64 rodadas: em cada rodada atualiza os registradores usando _Sigma1, _ch, K[t], W[t], _Sigma0 e _maj.
+                                5. Soma os valores de a..h ao estado (H0 += a, H1 += b, …), sempre mantendo os resultados em 32 bits.
+
+                                Retorno: None (altera o estado interno H0..H7).
+
+                                ---
+
+                                5. Gerenciamento da entrada e padding
+
+                                A classe precisa acumular os bytes fornecidos até que digest() seja chamado.
+
+                                Atributos internos:
+
+                                · _buffer: bytearray ou bytes com os dados ainda não processados.
+                                · _bit_length: int que armazena o tamanho total da mensagem em bits (soma dos comprimentos de todas as chamadas update).
+
+                                5.1. update(self, data: bytes)
+
+                                O que faz:
+
+                                1. Adiciona data ao buffer interno.
+                                2. Incrementa _bit_length com len(data) * 8.
+                                3. Enquanto houver pelo menos 64 bytes no buffer, retira um bloco de 64 bytes e chama _process_block.
+                                4. Mantém o restante (<64 bytes) no buffer para o próximo update ou digest.
+
+                                Retorno: Pode retornar self para permitir encadeamento (opcional).
+
+                                ---
+
+                                6. Finalização e obtenção do hash
+
+                                6.1. _pad(self) -> bytes
+
+                                O que faz:
+                                Implementa o padding MERKLE–DAMGÅRD:
+
+                                1. Copia os dados restantes do buffer.
+                                2. Adiciona o byte 0x80 (bit ‘1’ seguido de zeros).
+                                3. Calcula quantos bytes de zero são necessários para que o comprimento total (mensagem + padding + 8 bytes do comprimento) seja múltiplo de 64 bytes.
+                                4. Converte o comprimento original da mensagem em bits (_bit_length) em um inteiro de 64 bits big-endian e anexa ao final.
+                                5. Retorna um objeto bytes contendo o último(s) bloco(s) pronto(s) para serem processados.
+
+                                Retorno: bytes (tamanho múltiplo de 64).
+
+                                6.2. digest(self) -> bytes
+
+                                O que faz:
+
+                                1. Cria uma cópia do estado atual para não modificar o original (o ideal é que o objeto possa ser reutilizado após digest? Normalmente não, mas por segurança você pode desabilitar novos updates após digest, ou trabalhar com uma cópia).
+                                2. Obtém o(s) bloco(s) de padding através de _pad.
+                                3. Processa cada bloco de 64 bytes chamando _process_block.
+                                4. Converte os oito valores finais H0..H7 para 32 bytes concatenados (cada um em big-endian).
+                                5. Retorna esses 32 bytes.
+
+                                Retorno: bytes (32 bytes = 256 bits).
+
+                                6.3. hexdigest(self) -> str
+
+                                O que faz:
+                                Chama self.digest() e converte cada byte para seu valor hexadecimal de dois dígitos, retornando uma string minúscula de 64 caracteres.
+
+                                Retorno: str
+
+                                ---
+
+                                Como os pedaços se encaixam (passo a passo para o usuário da sua classe)
+
+                                1. hash_obj = SHA256()
+                                2. hash_obj.update(b"abc")  (pode ser chamado várias vezes)
+                                3. resultado_bytes = hash_obj.digest()   ou  resultado_hex = hash_obj.hexdigest()
+
+                                ---
+
+                                Observações importantes para a implementação (sem código)
+
+                                · Use struct.unpack(">16I", block) para extrair as 16 palavras de 32 bits do bloco.
+                                · Para a expansão W[16..63], você precisará acessar W[t-2], W[t-7], W[t-15], W[t-16] – mantenha a lista de 64 inteiros.
+                                · Todas as somas dentro da rodada de compressão devem ser feitas com ( ... ) & 0xFFFFFFFF para simular aritmética de 32 bits.
+                                · O comprimento da mensagem em bits no padding deve ser representado em 64 bits (8 bytes) big-endian – use struct.pack(">Q", bit_length).
+                                · Na expansão, _sigma0 e _sigma1 aplicam-se a palavras do escalonamento; nas rodadas, _Sigma0 e _Sigma1 aplicam-se aos registradores de trabalho. Não confunda os nomes.
+                                · Para testar, compare o resultado com hashlib.sha256(b"abc").hexdigest() (apenas durante o desenvolvimento; depois você não precisa mais da hashli

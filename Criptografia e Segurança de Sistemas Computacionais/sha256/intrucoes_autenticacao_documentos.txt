@@ -1,0 +1,9 @@
+Nesta atividade você deve utilizar o SHA256 que foi implementado por você;
+
+Implemente uma aplicação que receba um arquivo (de qualquer formato) e gere a respectiva chave (hash) SHA256.
+
+Essa mesma aplicação deve receber um arquivo (de qualquer formato) e uma chave (hash), então, deve informar se o arquivo é autentico ou não.
+
+Ao fim, se a  chave e o arquivo corretos forem fornecidos, sua aplicação retornará validando o arquivo.
+
+Se o arquivo sofrer qualquer alteração, sua aplicação deve retornar invalidando a autenticidade do arquivo.

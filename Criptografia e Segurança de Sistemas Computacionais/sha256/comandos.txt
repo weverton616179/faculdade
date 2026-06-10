@@ -1,0 +1,3 @@
+python file_authenticator.py hash <caminho_do_arquivo>
+
+python file_authenticator.py verify <caminho_do_arquivo> <hash_esperado>
