@@ -1,0 +1,38 @@
+Wine Quality
+https://archive.ics.uci.edu/dataset/186/wine+quality
+Tarefa: Treinar um classificador de acordo com as discussões em sala de aula em um módulo
+de inferência para demonstrar o modelo treinado em funcionamento
+Você baixará três arquivos:
+- um arquivo com os dados dos vinhos tintos
+- um arquivo com os dados dos vinhos brancos
+- um arquivo com os nomes das colunas
+Monte um arquivo com todos os dados (vinhos tintos e brancos) e com os nomes das colunas
+O atributo alvo (classe) é a coluna quality
+Avalie ao menos três metaestimadores (algoritmos) classificadores e selecione aquele com o
+melhor desempenho
+Você deve demonstrar:
+a) O fluxo de procedimentos até o treinamento do modelo (pipeline)
+b) Acurácia global, acurácia por classes (use a matriz de confusão para tanto) e a medida
+f1-score
+Black Friday Sales Dataset
+https://www.kaggle.com/datasets/noopurbhatt/retail-black-friday-sales-dataset
+Tarefa: Treinar um classificador de acordo com as discussões em sala de aula em um módulo
+de inferência para demonstrar o modelo treinado em funcionamento
+O seu sistema inteligente deve:
+indicar qual é a categoria de produto (product category) de acordo com a circunstância na qual
+uma venda ocorra;
+indicar qual será a forma de pagamento (payment_method) mais provável de acordo com a
+circunstância da venda
+indicar qual é o faixa etária (age_group) mais provável do comprador de acordo com a
+circunstância da venda;
+Para todas as indicações acima, o seu sistema de demonstrar um grau de certeza, com base
+no score da classificação
+Você deve demonstrar, para cada indicação do seu sistema inteligente:
+a) O fluxo de procedimentos até o treinamento do modelo (pipeline);
+b) Acurácia global, acurácia por classes (use a matriz de confusão para tanto) e a medida
+f1-score;
+Medidas de acurácia a serem computadas e demonstradas
+Acurácia global
+Especificidade
+Sensibilidade
+F1-Score
