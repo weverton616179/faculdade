@@ -1,0 +1,2 @@
+# Ignorar pastas chamadas "venv" em qualquer nível
+venv/
