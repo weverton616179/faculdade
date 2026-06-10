@@ -425,3 +425,122 @@ def descriptografar_mensagem(dados_criptografados: bytes, chave_privada: Private
         resultado.extend(chunk)
 
     return bytes(resultado).decode('utf-8')
+
+
+# =============================================================================
+# Main — Testes da biblioteca
+# =============================================================================
+
+if __name__ == "__main__":
+    print("=" * 60)
+    print("TESTES DA BIBLIOTECA RSA")
+    print("=" * 60)
+
+    # ------------------------------------------------------------------
+    # Teste 1: Geração de chaves
+    # ------------------------------------------------------------------
+    print("\n[Teste 1] Gerando par de chaves RSA-1024...")
+    pub, priv = gerar_chaves()
+    print(f"    Chave pública: n={pub.n}, e={pub.e}")
+    print(f"    Chave privada: n={priv.n}, d (oculto)")
+
+    # ------------------------------------------------------------------
+    # Teste 2: Criptografia e descriptografia de mensagem curta
+    # ------------------------------------------------------------------
+    print("\n[Teste 2] Mensagem curta...")
+    msg_curta = "Olá, mundo!"
+    cifrado = criptografar_mensagem(msg_curta, pub)
+    decifrado = descriptografar_mensagem(cifrado, priv)
+    assert decifrado == msg_curta, f"Falha: '{decifrado}' != '{msg_curta}'"
+    print(f"    Original:  {msg_curta}")
+    print(f"    Cifrado:   {cifrado.hex()[:60]}...")
+    print(f"    Decifrado: {decifrado}")
+    print("    ✓ OK")
+
+    # ------------------------------------------------------------------
+    # Teste 3: Mensagem longa (requer chunking)
+    # ------------------------------------------------------------------
+    print("\n[Teste 3] Mensagem longa (ultrapassa TAMANHO_CHUNK)...")
+    msg_longa = "A" * 350
+    cifrado = criptografar_mensagem(msg_longa, pub)
+    decifrado = descriptografar_mensagem(cifrado, priv)
+    assert decifrado == msg_longa, "Falha na mensagem longa"
+    print(f"    Tamanho original: {len(msg_longa)} caracteres")
+    print(f"    Tamanho cifrado:  {len(cifrado)} bytes")
+    print(f"    Decifrado confere: {decifrado[:50]}...")
+    print("    ✓ OK")
+
+    # ------------------------------------------------------------------
+    # Teste 4: Serialização / desserialização da chave pública
+    # ------------------------------------------------------------------
+    print("\n[Teste 4] Serialização da chave pública...")
+    dados_pub = serializar_chave_publica(pub)
+    pub_recuperada = desserializar_chave_publica(dados_pub)
+    assert pub.n == pub_recuperada.n and pub.e == pub_recuperada.e, \
+        "Chave pública recuperada não confere"
+    print(f"    Serializada: {len(dados_pub)} bytes")
+    print(f"    n confere: {pub.n == pub_recuperada.n}")
+    print(f"    e confere: {pub.e == pub_recuperada.e}")
+    print("    ✓ OK")
+
+    # ------------------------------------------------------------------
+    # Teste 5: Padding PKCS#1 — mensagem com tamanho exato no limite
+    # ------------------------------------------------------------------
+    print("\n[Teste 5] Mensagem no limite do chunk (100 bytes)...")
+    msg_limite = "B" * 100
+    cifrado = criptografar_mensagem(msg_limite, pub)
+    decifrado = descriptografar_mensagem(cifrado, priv)
+    assert decifrado == msg_limite, "Falha no limite do chunk"
+    print(f"    Tamanho original: {len(msg_limite)} caracteres")
+    print("    ✓ OK")
+
+    # ------------------------------------------------------------------
+    # Teste 6: Mensagem com caracteres especiais (UTF-8)
+    # ------------------------------------------------------------------
+    print("\n[Teste 6] Caracteres especiais UTF-8...")
+    msg_utf = "Criptografia RSA 🔐 segurança! áéíóú ç ñ €"
+    cifrado = criptografar_mensagem(msg_utf, pub)
+    decifrado = descriptografar_mensagem(cifrado, priv)
+    assert decifrado == msg_utf, "Falha em UTF-8"
+    print(f"    Original:  {msg_utf}")
+    print(f"    Decifrado: {decifrado}")
+    print("    ✓ OK")
+
+    # ------------------------------------------------------------------
+    # Teste 7: Mensagem vazia
+    # ------------------------------------------------------------------
+    print("\n[Teste 7] Mensagem vazia...")
+    msg_vazia = ""
+    cifrado = criptografar_mensagem(msg_vazia, pub)
+    decifrado = descriptografar_mensagem(cifrado, priv)
+    assert decifrado == msg_vazia, "Falha mensagem vazia"
+    print("    ✓ OK")
+
+    # ------------------------------------------------------------------
+    # Teste 8: Interoperabilidade — chaves diferentes
+    # ------------------------------------------------------------------
+    print("\n[Teste 8] Segundo par de chaves...")
+    pub2, priv2 = gerar_chaves()
+    msg = "Interoperabilidade RSA!"
+    cifrado = criptografar_mensagem(msg, pub2)
+    decifrado = descriptografar_mensagem(cifrado, priv2)
+    assert decifrado == msg, "Falha no segundo par de chaves"
+    print("    ✓ OK")
+
+    # ------------------------------------------------------------------
+    # Teste 9: Erro ao usar chave errada
+    # ------------------------------------------------------------------
+    print("\n[Teste 9] Chave errada (deve falhar no padding)...")
+    try:
+        cifrado = criptografar_mensagem("teste", pub)
+        descriptografar_mensagem(cifrado, priv2)
+        print("    ⚠ Não levantou exceção (improvável)")
+    except (ValueError, UnicodeDecodeError):
+        print("    ✓ OK — Exceção levantada ao usar chave errada")
+
+    # ------------------------------------------------------------------
+    # Resumo
+    # ------------------------------------------------------------------
+    print("\n" + "=" * 60)
+    print("RESULTADO: Todos os testes passaram! 🎉")
+    print("=" * 60)
