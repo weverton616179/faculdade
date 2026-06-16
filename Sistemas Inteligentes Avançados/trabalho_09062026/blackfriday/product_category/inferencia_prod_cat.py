@@ -1,73 +1,103 @@
+# ============================================================
 # IMPORTS
-import pandas as pd
-from pickle import load
+# ============================================================
+# stdlib
 from pathlib import Path
-import numpy as np
+from pickle import load
 
-# 1. Declarando Dados Novos
-columns_name = [
-    'original_price', 'discount_pct', 'final_price', 'quantity', 
-    'purchase_amount', 'is_weekend', 'is_black_friday','age_group', 
-    'gender', 'city', 'customer_segment', 'payment_method'
+# third-party
+import numpy as np
+import pandas as pd
+
+# ============================================================
+# 1. Dados de entrada para predição
+# ============================================================
+FEATURE_NAMES = [
+    'original_price', 'discount_pct', 'final_price', 'quantity',
+    'purchase_amount', 'is_weekend', 'is_black_friday',
+    'age_group',
+    'gender', 'city', 'customer_segment', 'payment_method',
 ]
 
-novos_dados = [[
-    230.05,        # original_price
-    40,            # discount_pct
-    138.03,        # final_price
-    1,             # quantity
-    138.03,        # purchase_amount
-    0,             # is_weekend
-    0,             # is_black_friday
-    '56+',         # age_group (Ordinal)
-    'Other',       # gender (Nominal)
-    'Dallas',      # city (Nominal)
-    'Returning',   # customer_segment (Nominal)
-    'PayPal'       # payment_method (Nominal)
+new_samples = [[
+    230.05,            # original_price
+    40,                # discount_pct
+    138.03,            # final_price
+    1,                 # quantity
+    138.03,            # purchase_amount
+    0,                 # is_weekend
+    0,                 # is_black_friday
+    '56+',             # age_group (ordinal)
+    'Other',           # gender (nominal)
+    'Dallas',          # city (nominal)
+    'Returning',       # customer_segment (nominal)
+    'PayPal',          # payment_method (nominal)
 ]]
 
-# cria um dataframe com os novos dados e estrutura de colunas
-dados_dataframe = pd.DataFrame(novos_dados, columns=columns_name)
+input_df = pd.DataFrame(new_samples, columns=FEATURE_NAMES)
 
-# 2. Pré-Processamento
-dados_num = ['original_price', 'discount_pct', 'final_price', 'quantity', 
-             'purchase_amount', 'is_weekend', 'is_black_friday']
-dados_cat_ord = ['age_group']
-dados_cat_nom = ['gender', 'city', 'customer_segment', 'payment_method']
+# ============================================================
+# 2. Carregamento dos artefatos salvos
+# ============================================================
 MODEL_DIR = Path(__file__).resolve().parent
 
-normalizador = load(open(MODEL_DIR / 'normalizador_num.pkl', 'rb'))
-normalizador_cat_ord = load(open(MODEL_DIR / 'normalizador_cat_ord.pkl', 'rb'))
-normalizador_cat_nom = load(open(MODEL_DIR / 'normalizador_cat_nom.pkl', 'rb'))
-modelo = load(open(MODEL_DIR / 'modelo_rf.pkl', 'rb'))
+num_features = [
+    'original_price', 'discount_pct', 'final_price', 'quantity',
+    'purchase_amount', 'is_weekend', 'is_black_friday',
+]
+ordinal_features = ['age_group']
+nominal_features = [
+    'gender', 'city', 'customer_segment', 'payment_method',
+]
 
-# 3. Normalização
-# numéricos
-dados_num_norm = pd.DataFrame(normalizador.transform(dados_dataframe[dados_num]), columns=dados_num, index=dados_dataframe.index)
+scaler_loaded = load(open(MODEL_DIR / 'normalizador_num.pkl', 'rb'))
+ord_encoders_loaded = load(open(MODEL_DIR / 'normalizador_cat_ord.pkl', 'rb'))
+nom_columns_loaded = load(open(MODEL_DIR / 'normalizador_cat_nom.pkl', 'rb'))
+model = load(open(MODEL_DIR / 'modelo_rf.pkl', 'rb'))
 
-# ordinal
-dados_ord_norm = dados_dataframe[dados_cat_ord].copy()
-for col in dados_cat_ord:
-    encoder = normalizador_cat_ord[col]
-    dados_ord_norm[col] = encoder.transform(dados_dataframe[col])
+# ============================================================
+# 3. Pré-processamento
+# ============================================================
+# --- numéricas: padronização ---
+num_scaled = pd.DataFrame(
+    scaler_loaded.transform(input_df[num_features]),
+    columns=num_features,
+    index=input_df.index,
+)
 
-# nominais
-dados_nom_norm = pd.get_dummies(dados_dataframe[dados_cat_nom], prefix=dados_cat_nom, dtype=int)
+# --- categóricas ordinais: label encoding ---
+ord_encoded = input_df[ordinal_features].copy()
+for col in ordinal_features:
+    encoder = ord_encoders_loaded[col]
+    ord_encoded[col] = encoder.transform(input_df[col])
 
-# Alinhamento estrutural
-dados_nom_final = pd.DataFrame(0, index=dados_dataframe.index, columns=normalizador_cat_nom)
-for col in normalizador_cat_nom:
-    if col in dados_nom_norm.columns:
-        dados_nom_final[col] = dados_nom_norm[col]
+# --- categóricas nominais: one-hot + alinhamento ---
+nom_encoded = pd.get_dummies(
+    input_df[nominal_features],
+    prefix=nominal_features,
+    dtype=int,
+)
 
-# concatenação
-dados_concat = pd.concat([dados_num_norm, dados_ord_norm, dados_nom_final], axis=1)
+nom_aligned = pd.DataFrame(
+    0, index=input_df.index, columns=nom_columns_loaded,
+)
+for col in nom_columns_loaded:
+    if col in nom_encoded.columns:
+        nom_aligned[col] = nom_encoded[col]
 
+# --- concatenação ---
+features_final = pd.concat(
+    [num_scaled, ord_encoded, nom_aligned], axis=1,
+)
+
+# ============================================================
 # 4. Predição
-result_predicao = modelo.predict(dados_concat)
-print("\n--- RESULTADO DA PREDIÇÃO ---")
-print(f"Classe Predita: {result_predicao[0]}")
-print("\nClasses possíveis do modelo:")
-print(modelo.classes_)
-print("\nProbabilidades por classe:")
-print(modelo.predict_proba(dados_concat))
+# ============================================================
+prediction = model.predict(features_final)
+
+print('\n--- PREDICTION RESULT ---')
+print(f'Predicted class: {prediction[0]}')
+print('\nKnown classes:')
+print(model.classes_)
+print('\nClass probabilities:')
+print(model.predict_proba(features_final))
