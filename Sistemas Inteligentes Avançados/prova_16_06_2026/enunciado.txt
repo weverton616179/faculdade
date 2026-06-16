@@ -1,0 +1,7 @@
+Utilize o arquivo mushoroom.csv e implemente um sistema inteligente que permita determinar se um cogumelo desconhecido é venonoso (poipoisonous) ou comestível (edible).
+
+
+Atenção aos critérios de aceitação e pesos:
+
+    1. A seleção da tarefa (classificação ou clusterizaçã) faz parte dos critérios avaliativos e está previamente descrita no arquivo  mushroom_ml_task.txt. Esse arquivo contem a tarefa correta a ser aplicada junto com a justiicativa e os pesos para tal.  O mushroom_ml_task.csv ficará oculto até 21h50, quando será evibido para todos os estudantes.
+    2. A coluna stalk-root possui dados incompletos, o que também faz parte da avaliação.
