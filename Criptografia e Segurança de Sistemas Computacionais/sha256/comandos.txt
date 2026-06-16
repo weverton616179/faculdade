@@ -1,3 +1,10 @@
 python file_authenticator.py hash <caminho_do_arquivo>
 
 python file_authenticator.py verify <caminho_do_arquivo> <hash_esperado>
+
+python3 file_authenticator.py verify teste.txt 961b6dd3ede3cb8ecbaacbd68de040cd78eb2ed5889130cceb4c49268ea4d506
+
+python3 file_authenticator.py hash teste.txt
+
+python3 client_app.py
+python3 server_app.py
