@@ -1,0 +1,382 @@
+Exercícios Práticos
+
+Padrões de Projeto (Design Patterns) em Java
+
+Factory Method e Abstract Factory
+
+Exercício 1:
+ 
+Sistema de Emissão de Apólices
+
+Contexto de negócio
+
+Uma seguradora de médio porte decidiu substituir a rotina de emissão de apólices, hoje resolvida
+
+por uma sequência de estruturas condicionais que cresce a cada produto novo lançado. A área de
+
+tecnologia re
+cebeu da diretoria comercial a especificação de quatro linhas de produto (Automóvel,
+
+Residencial, Vida e Viagem) e um requisito recorrente nas revisões de arquitetura: a inclusão de uma
+
+quinta linha de produto, já em estudo pelo time comercial, não pode exigir alteração de nenhuma
+
+classe em produção, apenas a adição de classes novas.
+
+A especificação a seguir descreve as regras de cálculo de prêmio, as validações obrigatórias de
+
+cobertura e a documentação exigida para cada linha de produto.
+
+Especificação fun
+cional
+
+•
+ 
+RF01 (Apólice Auto)
+ 
+—
+ 
+o prêmio mensal corresponde a 8% do valor de tabela FIPE do veículo,
+
+dividido por 12. Se o condutor tiver menos de 25 anos, aplica
+:
+se um acréscimo de 30% sobre o
+
+prêmio anual; se o tempo de habilitação for inferior a 2 anos, aplica
+:
+se um acréscimo adicional
+
+de 20%. A apólice exige cobertura contratada contra terceiros de, no mínimo, R$ 50.000,00;
+
+caso contrário, a contratação deve ser rejeitada. Documentos exigidos: CNH, CRLV e
+
+comprovante de residência.
+
+•
+ 
+RF02 (Apólice Residencia
+l)
+ 
+—
+ 
+o prêmio mensal corresponde a 1,5% do valor do imóvel ao ano,
+
+dividido por 12. Imóveis classificados como alto padrão recebem acréscimo de 25% sobre o
+
+prêmio anual. A contratação exige a apresentação de escritura ou contrato de locação; sem
+
+esse documento, a contratação deve ser rejeitada. Documentos exigidos: escritura ou contrato
+
+de locação e comprovante de residência.
+
+•
+ 
+RF03 (Apólice Vida)
+ 
+—
+ 
+o prêmio mensal é calculado por (idade do segurado × 12) + (capital
+
+segurado × 0,002). Segurados fumantes receb
+em acréscimo de 50% sobre o prêmio.
+
+Contratações com capital segurado acima de R$ 500.000,00 exigem atestado médico; sem esse
+
+documento, a contratação deve ser rejeitada. Documentos exigidos: documento de identidade,
+
+CPF e, quando aplicável, atestado médico.
+
+•
+ 
+RF04 (Apólice Viagem)
+ 
+—
+ 
+o prêmio é calculado por (dias de viagem × R$ 15,00), acrescido de R$
+
+100,00 quando o destino for internacional. Viagens internacionais exigem cobertura de
+
+assistência médica contratada de, no mínimo, US$ 30.000,00 e apresentação
+ 
+de passaporte; a
+ausência de qualquer um dos dois deve rejeitar a contratação. Documentos exigidos: itinerário
+
+de viagem e, quando aplicável, passaporte.
+
+Requisitos não funcionais
+
+•
+ 
+RNF01
+ 
+—
+ 
+novas linhas de produto devem poder ser adicionadas ao sistema sem alteração de
+
+nenhuma classe já existente (princípio do aberto/fechado).
+
+•
+ 
+RNF02
+ 
+—
+ 
+toda apólice emitida recebe um número único, prefixado conforme o tipo (AUTO
+-
+,
+
+RES
+-
+, VID
+-
+, VIA
+-
+).
+
+•
+ 
+RNF03
+ 
+—
+ 
+o sistema deve gerar, para toda contratação bem
+-
+sucedida, um resumo te
+xtual
+
+padronizado contendo número da apólice, segurado, data de emissão, prêmio calculado e
+
+documentos exigidos.
+
+Tarefa
+
+Implemente o sistema descrito utilizando explicitamente o padrão de projeto Factory Method (GoF),
+
+respeitando a seguinte estrutura:
+
+•
+ 
+uma classe abstrata de produto que declare os métodos comuns a toda apólice (cálculo de
+
+prêmio, validação de cobertura, listagem de documentos e geração de resumo), com uma
+
+subclasse concreta para cada linha de produto;
+
+•
+ 
+uma classe abstrata de criador que d
+eclare o método fábrica (abstrato) responsável por
+
+instanciar o produto, além de um método concreto e final que processe a contratação usando
+
+apenas a abstração do produto retornado pelo método fábrica;
+
+•
+ 
+uma subclasse concreta de criador para cada linha de produto, cada uma sobrescrevendo o
+
+método fábrica para retornar a apólice correspondente;
+
+•
+ 
+uma classe cliente que selecione o criador adequado a partir do tipo de apólice solicitado e
+
+nunca instancie diretamente uma classe concreta de produto.
+
+Entregáveis
+
+1.
+ 
+d
+iagrama de classes UML completo, mostrando a hierarquia de produtos, a hierarquia de
+
+criadores, a relação entre o método fábrica e o produto criado, e a classe cliente;
+
+2.
+ 
+implementação Java completa e compilável, incluindo uma classe de teste (main) que emita ao
+
+menos uma apólice de cada linha de produto e imprima o resumo gerado para cada uma.
+
+Critérios de avaliação
+
+•
+ 
+aplicação correta do Factory Method, com o método fábrica isolado nas subclasses de criador e
+
+o algoritmo de processamento centralizado na super
+classe;
+
+•
+ 
+implementação fiel das regras de cálculo de prêmio e das validações de RF01 a RF04, incluindo a
+
+rejeição de contratações que não atendam aos mínimos exigidos;
+
+•
+ 
+ausência de estruturas condicionais que decidam o tipo de produto dentro da classe cliente ou
+
+dentro da superclasse de criador;
+
+•
+ 
+aderência do diagrama de classes à implementação entregue.
+Exercício 2 :
+ 
+Checkout Internacional de Marketplace
+
+Nível de dificuldade: moderado.
+
+Contexto de negócio
+
+Um marketplace brasileiro está expandindo suas operações para os Estados Unidos e para a
+
+Alemanha. Ao finalizar um pedido, o sistema de checkout precisa gerar três artefatos: o documento
+
+fiscal, o processamento do pagamento e a etiqueta de envio. Após um incidente registrado durante
+
+o piloto da expansão, a equipe de compliance impôs uma exigência explícita: os três artefatos de um
+
+mesmo pedido precisam pertencer sempre ao me
+smo país de destino, porque a combinação de
+
+formatos de países diferentes (por exemplo, uma nota fiscal eletrônica brasileira associada a uma
+
+etiqueta de envio americana) gerou rejeição alfandegária e retrabalho manual da operação.
+
+Especificação funcional
+
+•
+ 
+RF01 (Brasil)
+ 
+:
+ 
+o documento fiscal é uma nota fiscal eletrônica, com CFOP 5.102 para operações
+
+dentro do estado e 6.102 para operações interestaduais, ICMS de 18% (ou 12% em operações
+
+interestaduais) e chave de acesso simulada de 44 dígitos. O pagamento é
+ 
+processado via Pix,
+
+com desconto de 5%, ou via boleto, com compensação em 3 dias úteis. A etiqueta de envio é
+
+gerada pelos Correios, com CEP no formato 00000
+-
+000.
+
+•
+ 
+RF02 (Estados Unidos)
+ 
+:
+ 
+o documento fiscal é uma sales invoice, com sales tax calculada
+
+conforme o estado de destino (California 7,25%, Texas 6,25%, Oregon isento) e identificação do
+
+vendedor por EIN. O pagamento é processado por cartão de crédito, com verificação AVS. A
+
+etiqueta de envio é gerada pela USPS, no formato ZIP+4.
+
+•
+ 
+RF03 (Alemanha)
+:
+ 
+o documento fiscal é uma VAT invoice, com Umsatzsteuer de 19% (ou 7%
+
+para produtos essenciais) e VAT
+-
+ID do vendedor. O pagamento é processado por SEPA Direct
+
+Debit. A etiqueta de envio é gerada pela Deutsche Post, no formato PLZ de 5 dígitos.
+
+Requisitos não funcionais
+
+•
+ 
+RNF01
+:
+ 
+a adição de um novo país de operação não pode exigir alteração da lógica de checkout
+
+já existente, apenas a inclusão de novas classes.
+
+•
+ 
+RNF02
+:
+ 
+a classe responsável por finalizar o pedido não pode conter estruturas condicionais que
+
+deci
+dam, país a país, qual documento fiscal, processador de pagamento ou etiqueta de envio
+
+utilizar; ela deve depender apenas de abstrações.
+
+•
+ 
+RNF03
+:
+ 
+o relatório final do pedido deve exibir os três artefatos gerados em um formato
+
+padronizado, independentemente do país de destino.
+
+Tarefa
+
+Projete e implemente uma solução orientada a objetos que satisfaça a especificação acima e que
+
+impeça, pela própria estrutura das classes, que artefatos de países diferentes sejam combinados em
+
+um mesmo pedido. Identifique, a par
+tir dos requisitos, qual padrão de projeto da família GoF resolve
+
+esse problema e utilize
+-
+o na implementação.
+
+Entregáveis
+3.
+ 
+diagrama de classes UML completo da solução adotada, incluindo as interfaces de produto, as
+
+classes concretas por país e o componente responsável por selecioná
+-
+las;
+
+4.
+ 
+implementação Java completa e compilável, incluindo uma classe de teste (main) que finalize
+
+um pedido para cada um dos três países e imprima o relatório gerado.
+
+Critérios de avaliação
+
+•
+ 
+identificação do padrão de projeto adequa
+do ao problema a partir da especificação, sem que o
+
+nome do padrão tenha sido informado no enunciado;
+
+•
+ 
+garantia estrutural de que os três artefatos de um pedido pertencem sempre ao mesmo país
+
+(nenhuma combinação inválida deve ser possível de se escrever no código cliente sem alterar a
+
+fábrica utilizada);
+
+•
+ 
+implementação fiel das regras de cálculo de RF01 a RF03;
+
+•
+ 
+facilidade de extensão para um quarto país, avaliada pela quantidade de classes existentes que
+
+precisariam ser alteradas.
