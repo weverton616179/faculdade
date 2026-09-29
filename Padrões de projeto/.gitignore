@@ -1,0 +1,17 @@
+# ---- Artefatos de compilacao Java (gerados) ----
+*.class
+
+# ---- Saidas de build geradas pelo compilar_tudo.ps1 ----
+_build/
+
+# ---- Editores / SO ----
+.vscode/
+.idea/
+*.iml
+Thumbs.db
+desktop.ini
+
+# ---- Arquivos temporarios do Office (travam o commit) ----
+~$*.docx
+~$*.pptx
+~$*.xlsx

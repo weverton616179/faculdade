@@ -1,0 +1,26 @@
+Instruções gerais para a avaliação relativa ao 1o. bimestre
+
+Estas são informações importantes para a realização da avaliação relativa ao 1o. bimestre:
+
+    vocês estão divididos em dois grupos (turma 1 e turma 2)
+    horários das avaliações:
+    turma 1: das 19h00 às 20h00
+    turma 2: das 20:15 às 21:15
+    todos os estudantes ocuparão mesas voltadas para o fundo da sala (lado oposto à porta), deforma eu eu possa acompanhar suas atividades mesmo estando longe
+    ao chegarem, acessem os computadores e iniciem um projeto Java no VSCode, de forma que intelisence e demais recursos sejam ativados
+    baixem os seus códigos para consulta
+
+Atenção:
+
+    Não será permitido o uso de IA na realização da avaliação, sob pena de zeramento da nota
+    O acesso à internet será desativado em sala
+    Usuários de notebooks também deverão desconectar-se da internte, desligando wi-fi, sob pena de zeramento da nota
+    Códigos com taxa de similaridade acima de 85% serão considerados cópias e a nota será zerada
+    A entrega do código relativo à avaliação será exclusivamente pelo Git, sob pena de zeramento da nota.
+    A conexão com Internet será restaurada para a entrega do código, me avise quando for necessário.
+
+Situações omissas serão tratadas diretamente comigo.
+
+Sucesso a todos!
+
+Prof Escobar

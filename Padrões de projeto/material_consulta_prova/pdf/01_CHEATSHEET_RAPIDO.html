@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>CHEAT SHEET — Padrões de Projeto (1.º Bimestre)</title>
+<style>
+:root { --fg:#1a1a1a; --muted:#555; --line:#d0d7de; --accent:#0b5394; --code:#f6f8fa; }
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+       color: var(--fg); background:#fff; margin:0; padding:32px 40px;
+       line-height:1.55; font-size:15px; }
+h1 { font-size:1.75em; color:var(--accent); border-bottom:3px solid var(--accent);
+     padding-bottom:.3em; margin:0 0 .8em; }
+h2 { font-size:1.35em; color:var(--accent); border-bottom:1px solid var(--line);
+     padding-bottom:.2em; margin:1.6em 0 .6em; page-break-after:avoid; }
+h3 { font-size:1.12em; margin:1.3em 0 .5em; color:#12395f; page-break-after:avoid; }
+h4 { font-size:1em; margin:1.1em 0 .4em; color:#12395f; }
+p, li { margin:.45em 0; }
+ul, ol { padding-left:1.5em; }
+code { font-family:Consolas,"Cascadia Mono","Courier New",monospace;
+       background:var(--code); padding:.12em .35em; border-radius:3px; font-size:.9em; }
+pre { background:var(--code); border:1px solid var(--line); border-left:4px solid var(--accent);
+      border-radius:5px; padding:12px 14px; overflow-x:auto; page-break-inside:avoid; }
+pre code { background:none; padding:0; font-size:.84em; line-height:1.42; }
+table { border-collapse:collapse; width:100%; margin:1em 0; font-size:.92em; page-break-inside:avoid; }
+th, td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+th { background:#eef3f9; font-weight:600; }
+tr:nth-child(even) td { background:#fafbfc; }
+blockquote { margin:1em 0; padding:.6em 1em; border-left:4px solid #f0a500;
+             background:#fffbf0; color:#333; }
+blockquote p { margin:.3em 0; }
+hr { border:none; border-top:1px solid var(--line); margin:1.8em 0; }
+a { color:var(--accent); text-decoration:none; }
+.doc-header { font-size:.8em; color:var(--muted); margin-bottom:1.5em;
+              border-bottom:1px dashed var(--line); padding-bottom:.5em; }
+@media print {
+  body { padding:0; font-size:11.5px; }
+  pre { font-size:9.5px; }
+  h1 { font-size:1.5em; }
+  h2 { font-size:1.2em; }
+  @page { margin:14mm 12mm; }
+}
+</style>
+</head>
+<body>
+<div class="doc-header">Padroes de Projeto &mdash; Material de consulta para a prova &nbsp;|&nbsp; Prof. Escobar &nbsp;|&nbsp; gerado em 29/09/2026 18:57</div>
+<h1>CHEAT SHEET — Padrões de Projeto (1.º Bimestre)</h1>
+<blockquote><p>Consulta rápida para a prova. Perfil da avaliação: <strong>projeto Java no VS Code, sem internet, sem IA, entrega pelo Git</strong>. Foque em escrever a <strong>estrutura do padrão</strong> e em <strong>justificar com SOLID</strong>.</p></blockquote>
+<hr>
+<h2>1. Escolha do padrão em 10 segundos (árvore de decisão)</h2>
+<pre><code>
+O enunciado pede para criar OBJETOS sem o cliente depender das classes concretas?
+
+├── UM produto (uma família de 1 objeto), a variação é "qual subclasse criar"
+│     └── FACTORY METHOD
+│         criador abstrato + método fábrica abstrato + subclasse de criador por produto
+│
+├── VÁRIOS produtos que devem ser usados JUNTOS / do mesmo "tema"
+│     └── ABSTRACT FACTORY
+│         fábrica abstrata com 1 método por produto + 1 fábrica concreta por família
+│
+├── UM objeto único compartilhado no sistema (config, conexão, log, pool)
+│     └── SINGLETON
+│
+├── Copiar objetos complexos sem conhecer a classe concreta / sem repetir construtor
+│     └── PROTOTYPE  (clone)
+│
+├── Avisar vários objetos quando UM muda de estado (1 → N)
+│     └── OBSERVER
+│
+├── Simplificar o acesso a um subsistema complicado (1 método para N chamadas)
+│     └── FACADE
+│
+├── Fazer uma interface existente funcionar com outra esperada (incompatível)
+│     └── ADAPTER
+│
+└── Adicionar responsabilidades a um objeto DINAMICAMENTE, sem explosão de subclasses
+      └── DECORATOR
+</code></pre>
+<p><strong>Palavras-chave que denunciam o padrão no enunciado:</strong></p>
+<table>
+<tr><th>Trecho do enunciado</th><th>Padrão</th></tr>
+<tr><td>"não pode exigir alteração de nenhuma classe em produção, apenas adição de classes novas"</td><td>OCP → Factory Method / Abstract Factory</td></tr>
+<tr><td>"os artefatos de um mesmo pedido precisam pertencer sempre ao mesmo país"</td><td><strong>Abstract Factory</strong> (família de produtos)</td></tr>
+<tr><td>"o cliente não pode conter estruturas condicionais que decidam qual classe usar"</td><td>Factory Method / Abstract Factory</td></tr>
+<tr><td>"instância única", "global point of access"</td><td>Singleton</td></tr>
+<tr><td>"novas instâncias a partir de um modelo existente", "cópia"</td><td>Prototype</td></tr>
+<tr><td>"quando um objeto muda de estado, todos os dependentes são notificados"</td><td>Observer</td></tr>
+<tr><td>"interface unificada para um conjunto de interfaces do subsistema"</td><td>Facade</td></tr>
+<tr><td>"converter a interface de uma classe em outra interface esperada pelo cliente"</td><td>Adapter</td></tr>
+<tr><td>"adicionar responsabilidades dinamicamente, sem alterar a estrutura"</td><td>Decorator</td></tr>
+</table>
+<hr>
+<h2>2. SOLID — definição de uma linha + onde cada um aparece</h2>
+<table>
+<tr><th></th><th>Princípio</th><th>Definição de bolso</th><th>Aparece em</th></tr>
+<tr><td><strong>S</strong></td><td>Single Responsibility</td><td>Uma classe, <strong>um único motivo</strong> para mudar.</td><td>Separar <code>Disciplina</code> de <code>Aluno</code>; separar cálculo de desconto de <code>Funcionario</code>.</td></tr>
+<tr><td><strong>O</strong></td><td>Open/Closed</td><td><strong>Aberta para extensão, fechada para modificação</strong>.</td><td>Novo produto/país entra por <strong>nova classe</strong>, sem tocar nas existentes.</td></tr>
+<tr><td><strong>L</strong></td><td>Liskov Substitution</td><td>A subclasse <strong>substitui</strong> a base sem quebrar o programa.</td><td><code>Financeiro</code> aceita qualquer <code>Funcionario</code>; <code>Disciplina</code> aceita qualquer nível.</td></tr>
+<tr><td><strong>I</strong></td><td>Interface Segregation</td><td>Várias interfaces <strong>específicas</strong> &gt; uma interface "gorda".</td><td>Interface <code>Disciplina</code> enxuta (<code>isAprovado</code>, <code>getNome</code>).</td></tr>
+<tr><td><strong>D</strong></td><td>Dependency Inversion</td><td>Dependa de <strong>abstrações</strong>, não de implementações concretas.</td><td><code>Aluno</code> recebe <code>Disciplina</code>; <code>Checkout</code> recebe <code>CheckoutFactory</code>.</td></tr>
+</table>
+<p><strong>Como citar na prova:</strong> "A solução atende ao <strong>OCP</strong> porque novos produtos entram</p>
+<p>por novas classes; e ao <strong>DIP</strong> porque o cliente depende apenas da abstração</p>
+<p><code>ApoliceFactory</code>, nunca de <code>ApoliceAuto</code>."</p>
+<hr>
+<h2>3. Os padrões em uma página cada</h2>
+<h3>3.1 Factory Method — "delegar a criação às subclasses"</h3>
+<ul>
+<li><strong>Intenção:</strong> definir uma <strong>interface para criar um objeto</strong>, mas deixar as</li>
+</ul>
+<p>  <strong>subclasses decidirem qual classe instanciar</strong>. Permite que a classe deixe a</p>
+<p>  definição dos tipos específicos para as subclasses.</p>
+<ul>
+<li><strong>Quando usar:</strong> quando se deseja criar objetos de um tipo específico <strong>sem que o código cliente dependa das classes concretas</strong>.</li>
+<li><strong>Participantes:</strong> <code>Produto</code> (abstrato) · <code>ProdutoConcreto</code> · <code>Criador</code></li>
+</ul>
+<p>  (abstrato, com o <strong>método fábrica</strong>) · <code>CriadorConcreto</code> · <code>Cliente</code>.</p>
+<ul>
+<li><strong>Regra de ouro na prova:</strong> o <strong>método fábrica fica isolado nas subclasses de criador</strong>; o <strong>algoritmo de processamento fica centralizado na superclasse</strong></li>
+</ul>
+<p>  (método concreto e <strong><code>final</code></strong>), e usa <strong>apenas a abstração do produto</strong>.</p>
+<pre class="lang-java"><code>
+// PRODUTO ABSTRATO
+public abstract class Produto {
+    public abstract double calcular();
+    public String resumo() { return "Total: " + calcular(); } // algoritmo comum
+}
+
+// PRODUTOS CONCRETOS
+public class ProdutoA extends Produto { public double calcular() { return 10.0; } }
+public class ProdutoB extends Produto { public double calcular() { return 20.0; } }
+
+// CRIADOR ABSTRATO: método fábrica + algoritmo concreto e final
+public abstract class Criador {
+    protected abstract Produto criarProduto();   // &lt;&lt;&lt; MÉTODO FÁBRICA
+    public final String processar() {            // algoritmo NÃO varia
+        Produto p = criarProduto();              // só a abstração é usada
+        return p.resumo();
+    }
+}
+
+// CRIADORES CONCRETOS: cada um instancia o seu produto
+public class CriadorA extends Criador { protected Produto criarProduto() { return new ProdutoA(); } }
+public class CriadorB extends Criador { protected Produto criarProduto() { return new ProdutoB(); } }
+
+// CLIENTE: escolhe o criador, nunca instancia produto concreto
+public class Main {
+    public static void main(String[] args) {
+        Criador c = new CriadorA();       // trocar aqui = trocar o produto
+        System.out.println(c.processar());
+    }
+}
+</code></pre>
+<p><strong>Erros que zeram o critério "ausência de condicionais":</strong></p>
+<p><code>if (tipo.equals("A")) return new ProdutoA();</code> <strong>dentro</strong> do cliente ou da</p>
+<p>superclasse de criador. A decisão deve estar <strong>na escolha do criador concreto</strong>.</p>
+<hr>
+<h3>3.2 Abstract Factory — "famílias de produtos que combinam entre si"</h3>
+<ul>
+<li><strong>Intenção:</strong> fornecer uma interface para criar <strong>famílias de objetos relacionados</strong> sem especificar suas classes concretas. Encapsula grupos de</li>
+</ul>
+<p>  fábricas e controla como o cliente acessa tais fábricas.</p>
+<ul>
+<li><strong>Diferença essencial do Factory Method:</strong> Factory Method cria <strong>um</strong> produto</li>
+</ul>
+<p>  (herança, subclasse decide); Abstract Factory cria <strong>uma família de vários produtos</strong> (composição: o cliente recebe a fábrica pronta).</p>
+<ul>
+<li><strong>Garantia estrutural:</strong> como <strong>uma única fábrica</strong> cria <strong>todos</strong> os produtos,</li>
+</ul>
+<p>  é <strong>impossível</strong> combinar produtos de famílias diferentes sem trocar a fábrica.</p>
+<pre class="lang-java"><code>
+// PRODUTOS (interfaces) — 3 famílias de artefatos
+public interface DocumentoFiscal { String gerar(); }
+public interface Pagamento       { String processar(); }
+public interface EtiquetaEnvio   { String gerar(); }
+
+// PRODUTOS CONCRETOS por família (Brasil)
+class NotaFiscal implements DocumentoFiscal { public String gerar() { return "NF-e"; } }
+class Pix        implements Pagamento       { public String processar() { return "Pix"; } }
+class Correios   implements EtiquetaEnvio   { public String gerar() { return "CEP 00000-000"; } }
+
+// FÁBRICA ABSTRATA: 1 método por produto da família
+public interface FabricaPais {
+    DocumentoFiscal criarDocumentoFiscal();
+    Pagamento       criarPagamento();
+    EtiquetaEnvio   criarEtiqueta();
+}
+
+// FÁBRICA CONCRETA: cria a FAMÍLIA INTEIRA do país
+public class FabricaBrasil implements FabricaPais {
+    public DocumentoFiscal criarDocumentoFiscal() { return new NotaFiscal(); }
+    public Pagamento       criarPagamento()       { return new Pix(); }
+    public EtiquetaEnvio   criarEtiqueta()        { return new Correios(); }
+}
+
+// CLIENTE: depende SÓ da abstração; nenhum if por país
+public class Checkout {
+    public String finalizar(FabricaPais fabrica) {
+        return fabrica.criarDocumentoFiscal().gerar() + "\n"
+             + fabrica.criarPagamento().processar() + "\n"
+             + fabrica.criarEtiqueta().gerar();
+    }
+}
+</code></pre>
+<p><strong>Extensão para um 4.º país:</strong> adicionar <strong>1 fábrica concreta + N produtos concretos</strong>. <strong>Zero</strong> classes existentes alteradas (RNF01/OCP).</p>
+<hr>
+<h3>3.3 Singleton — "uma única instância"</h3>
+<pre class="lang-java"><code>
+public class Configuracao {
+    private static Configuracao instancia;          // atributo estático
+
+    private Configuracao() { }                      // construtor PRIVADO
+
+    public static synchronized Configuracao getInstance() {   // acesso global
+        if (instancia == null) {
+            instancia = new Configuracao();
+        }
+        return instancia;
+    }
+}
+</code></pre>
+<p>Pontos de prova: construtor <strong>privado</strong> · atributo <strong><code>static</code></strong> · método</p>
+<p><strong><code>static</code></strong> de acesso · <code>synchronized</code> para <em>thread safety</em>.</p>
+<p>Variante <em>eager</em>: <code>private static final Configuracao INSTANCIA = new Configuracao();</code>.</p>
+<hr>
+<h3>3.4 Prototype — "clonar em vez de construir"</h3>
+<pre class="lang-java"><code>
+public abstract class Forma implements Cloneable {
+    protected String cor;
+    public abstract Forma clonar();
+    public void setCor(String cor) { this.cor = cor; }
+}
+
+public class Circulo extends Forma {
+    private double raio;
+    public Circulo(double raio) { this.raio = raio; }
+    @Override public Forma clonar() {
+        try { return (Circulo) super.clone(); }        // cópia rasa
+        catch (CloneNotSupportedException e) { throw new RuntimeException(e); }
+    }
+}
+</code></pre>
+<p>Obs.: para cópia <strong>profunda</strong>, clone também os objetos internos (listas, etc.).</p>
+<hr>
+<h3>3.5 Observer — "1 muda, N são notificados"</h3>
+<pre class="lang-java"><code>
+public interface Observador { void atualizar(); }
+
+public class Assunto {
+    private final List&lt;Observador&gt; observadores = new ArrayList&lt;&gt;();
+    private int estado;
+
+    public void attach(Observador o) { observadores.add(o); }
+    public int getEstado() { return estado; }
+    public void setEstado(int estado) {
+        this.estado = estado;
+        notificarTodos();                     // notifica ao MUDAR DE ESTADO
+    }
+    private void notificarTodos() {
+        for (Observador o : observadores) o.atualizar();
+    }
+}
+
+public class ObservadorConcreto implements Observador {
+    private final Assunto assunto;
+    public ObservadorConcreto(Assunto assunto) {
+        this.assunto = assunto;
+        this.assunto.attach(this);            // auto-registro no construtor
+    }
+    @Override public void atualizar() {
+        System.out.println("Novo estado: " + assunto.getEstado());
+    }
+}
+</code></pre>
+<hr>
+<h3>3.6 Facade — "uma porta de entrada simples"</h3>
+<pre class="lang-java"><code>
+public class FachadaComputador {
+    private Cpu cpu = new Cpu();
+    private Memoria memoria = new Memoria();
+    private Disco disco = new Disco();
+
+    public void ligar() {                     // 1 chamada -&gt; N subsistemas
+        cpu.iniciar();
+        memoria.carregar();
+        disco.ler();
+    }
+}
+</code></pre>
+<p>Não impede o acesso direto ao subsistema; apenas <strong>simplifica</strong> o uso comum.</p>
+<hr>
+<h3>3.7 Adapter — "traduzir uma interface para outra"</h3>
+<pre class="lang-java"><code>
+public interface Alvo { String requisicao(); }          // o que o cliente espera
+
+public class Adaptado {                                  // interface incompatível
+    public String requisicaoEspecifica() { return "formato antigo"; }
+}
+
+public class Adaptador implements Alvo {                 // composição
+    private final Adaptado adaptado;
+    public Adaptador(Adaptado adaptado) { this.adaptado = adaptado; }
+    @Override public String requisicao() { return adaptado.requisicaoEspecifica(); }
+}
+</code></pre>
+<hr>
+<h3>3.8 Decorator — "camadas de responsabilidade em tempo de execução"</h3>
+<pre class="lang-java"><code>
+public interface Bebida { String descricao(); double preco(); }
+
+public class Cafe implements Bebida {                    // componente concreto
+    public String descricao() { return "Cafe"; }
+    public double preco()     { return 3.0; }
+}
+
+public abstract class Condimento implements Bebida {     // decorador abstrato
+    protected final Bebida bebida;                       // MANTÉM referência
+    public Condimento(Bebida bebida) { this.bebida = bebida; }
+}
+
+public class Leite extends Condimento {                  // decorador concreto
+    public Leite(Bebida bebida) { super(bebida); }
+    public String descricao() { return bebida.descricao() + ", leite"; }
+    public double preco()     { return bebida.preco() + 0.5; }   // SOMA
+}
+
+// USO: empilhar decoradores
+Bebida b = new Cafe();
+b = new Leite(b);
+b = new Acucar(b);
+System.out.println(b.descricao() + " = " + b.preco());
+</code></pre>
+<p>Diferença para herança: no Decorator as responsabilidades são <strong>combinadas dinamicamente</strong>, evitando a <strong>explosão de subclasses</strong> (LeiteComAcucar,</p>
+<p>LeiteSemAcucar, ...).</p>
+<hr>
+<h2>4. Cola de sintaxe Java (para não perder ponto bobo)</h2>
+<pre class="lang-java"><code>
+// ---- Herança / polimorfismo -------------------------------------------
+public abstract class Animal {                 // abstract: NÃO instanciável
+    protected String nome;
+    public Animal(String nome) { this.nome = nome; }
+    public abstract String emitirSom();        // SEM corpo
+}
+public class Cachorro extends Animal {
+    public Cachorro(String nome) { super(nome); }   // chama o construtor da base
+    @Override public String emitirSom() { return "latido"; }
+}
+Animal a = new Cachorro("Rex");                // referência base, objeto filho
+a.emitirSom();                                 // ligação tardia (polimorfismo)
+
+// ---- Interfaces -------------------------------------------------------
+public interface Disciplina {                  // contrato: só assinaturas
+    String getNome();                          // implicitamente public abstract
+    boolean isAprovado();
+}
+public class Graduacao implements Disciplina { // implements (não extends)
+    public String getNome() { return "X"; }
+    public boolean isAprovado() { return true; }
+}
+
+// ---- super ------------------------------------------------------------
+super.metodo();          // método da superclasse  (NÃO funciona se for abstract)
+super(atributos);        // chamar o construtor da superclasse (1.ª linha!)
+
+// ---- Coleções ---------------------------------------------------------
+import java.util.*;                            // ou import específico
+List&lt;String&gt; lista = new ArrayList&lt;&gt;();        // SEMPRE a interface à esquerda
+lista.add("a"); lista.get(0); lista.size();
+Map&lt;String,Integer&gt; m = new HashMap&lt;&gt;();
+m.put("k", 1); m.get("k"); m.containsKey("k");
+for (String s : lista) { }                     // for-each
+List.of("a","b");                              // lista imutável (Java 9+)
+
+// ---- Números ----------------------------------------------------------
+double x = 1234.5;
+System.out.printf("%.2f%n", x);                // 1234,50  (%n = quebra de linha)
+System.out.printf("%-12s|%8.2f%n", "abc", x);  // alinhamentos
+Math.round(x);                                 // arredondar
+"%.2f".formatted(x);                           // Java 15+
+// ATENÇÃO: em Java use PONTO decimal no código (0.08), mesmo em pt-BR.
+
+// ---- Strings ----------------------------------------------------------
+s.equals("x")         // NUNCA s == "x"
+s.equalsIgnoreCase("x"); s.toUpperCase(); s.trim();
+String.join(", ", lista);
+s.substring(0, 3);
+
+// ---- Conversões de unidade (muito usado no frete) ----------------------
+double kg = gramas / 1000.0;      // 500 g -&gt; 0.5 kg
+double m3 = cm3 / 1_000_000.0;    // 200 cm3 -&gt; 0.0002 m3
+
+// ---- Exceções ---------------------------------------------------------
+public void registrar(double nota) {
+    if (nota &lt; 0 || nota &gt; 10) {
+        throw new IllegalArgumentException("Nota invalida: " + nota);
+    }
+}
+try { ... } catch (IllegalArgumentException e) { System.out.println(e.getMessage()); }
+</code></pre>
+<p><strong>Regras de arquivo/compilação (erros clássicos na prova):</strong></p>
+<ul>
+<li>1 classe <code>public</code> por arquivo, <strong>com o mesmo nome do arquivo</strong> (<code>Cachorro.java</code>).</li>
+<li>Classes <strong>não</strong> públicas podem ficar no mesmo arquivo, mas o professor precisa</li>
+</ul>
+<p>  achar as coisas — prefira 1 arquivo por classe.</p>
+<ul>
+<li>Nome do pacote (<code>package x;</code>) deve casar com a pasta; em prova, <strong>evite pacotes</strong></li>
+</ul>
+<p>  para não errar caminho.</p>
+<ul>
+<li><code>javac *.java</code> compila tudo; <code>java ClasseComMain</code> executa.</li>
+<li>Esquecer <code>@Override</code> não quebra, mas perde ponto de "sobrescrita explícita".</li>
+<li>Sobrescrever <code>equals</code> sem sobrescrever <code>hashCode</code> é erro conceitual.</li>
+<li><code>List.of(...)</code> é <strong>imutável</strong>; use <code>new ArrayList&lt;&gt;(List.of(...))</code> se precisar alterar.</li>
+</ul>
+<hr>
+<h2>5. Checklist final antes de entregar (o professor cobra isto)</h2>
+<ul>
+<li>[ ] O <strong>cliente não tem <code>if</code>/<code>switch</code> decidindo tipo de produto</strong>.</li>
+<li>[ ] O <strong>método fábrica está isolado nas subclasses</strong> de criador.</li>
+<li>[ ] O <strong>algoritmo de processamento está na superclasse</strong> e é <code>final</code>.</li>
+<li>[ ] O cliente <strong>nunca</strong> faz <code>new ProdutoConcreto()</code>.</li>
+<li>[ ] <strong>Diagrama UML</strong> bate com o código (nomes, atributos, métodos, setas).</li>
+<li>[ ] Existe uma classe <strong><code>main</code> de teste</strong> que cobre <strong>sucesso E rejeição</strong>.</li>
+<li>[ ] O código <strong>compila</strong> (<code>javac</code>) e <strong>executa</strong> sem erro.</li>
+<li>[ ] Comentários curtos citando o <strong>RF/RNF</strong> e o <strong>padrão/SOLID</strong> aplicados.</li>
+<li>[ ] Entrega <strong>pelo Git</strong> (a avaliação exige; commit + push).</li>
+<li>[ ] Wi-Fi <strong>desligado</strong> durante a prova; religar só na hora de entregar.</li>
+</ul>
+<hr>
+<h2>6. Setas do diagrama UML (notação)</h2>
+<table>
+<tr><th>Notação</th><th>Significado</th></tr>
+<tr><td>`A &lt;</td><td>-- B`</td><td>B <strong>herda</strong> de A (generalização, triângulo vazado)</td></tr>
+<tr><td>`A &lt;</td><td>.. B`</td><td>B <strong>implementa</strong> a interface A (triângulo vazado, linha tracejada)</td></tr>
+<tr><td><code>A --&gt; B</code></td><td>A <strong>conhece</strong> B (associação)</td></tr>
+<tr><td><code>A ..&gt; B</code></td><td>A <strong>depende de</strong> B (dependência, linha tracejada)</td></tr>
+<tr><td><code>A o-- B</code></td><td><strong>Agregação</strong> (B pode viver sem A; losango vazado)</td></tr>
+<tr><td><code>A *-- B</code></td><td><strong>Composição</strong> (B morre com A; losango cheio)</td></tr>
+<tr><td>`A ..</td><td>&gt; B`</td><td>B <strong>realiza</strong> A (Mermaid, mesma ideia de `&lt;</td><td>..`)</td></tr>
+</table>
+<p>No <strong>Mermaid</strong> (que renderiza no VS Code e no GitHub):</p>
+<pre><code>
+```mermaid
+classDiagram
+    class Animal { &lt;&lt;abstract&gt;&gt; +emitirSom()* String }
+    class Cachorro { +emitirSom() String }
+    Animal &lt;|-- Cachorro
+```
+</code></pre>
+<p><code>&lt;&lt;abstract&gt;&gt;</code> e <code>&lt;&lt;interface&gt;&gt;</code> são estereótipos; <code>*</code> marca método abstrato.</p>
+
+</body>
+</html>

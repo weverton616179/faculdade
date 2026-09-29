@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>REFERÊNCIA DE SINTAXE — Diagramas de Classe UML</title>
+<style>
+:root { --fg:#1a1a1a; --muted:#555; --line:#d0d7de; --accent:#0b5394; --code:#f6f8fa; }
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+       color: var(--fg); background:#fff; margin:0; padding:32px 40px;
+       line-height:1.55; font-size:15px; }
+h1 { font-size:1.75em; color:var(--accent); border-bottom:3px solid var(--accent);
+     padding-bottom:.3em; margin:0 0 .8em; }
+h2 { font-size:1.35em; color:var(--accent); border-bottom:1px solid var(--line);
+     padding-bottom:.2em; margin:1.6em 0 .6em; page-break-after:avoid; }
+h3 { font-size:1.12em; margin:1.3em 0 .5em; color:#12395f; page-break-after:avoid; }
+h4 { font-size:1em; margin:1.1em 0 .4em; color:#12395f; }
+p, li { margin:.45em 0; }
+ul, ol { padding-left:1.5em; }
+code { font-family:Consolas,"Cascadia Mono","Courier New",monospace;
+       background:var(--code); padding:.12em .35em; border-radius:3px; font-size:.9em; }
+pre { background:var(--code); border:1px solid var(--line); border-left:4px solid var(--accent);
+      border-radius:5px; padding:12px 14px; overflow-x:auto; page-break-inside:avoid; }
+pre code { background:none; padding:0; font-size:.84em; line-height:1.42; }
+table { border-collapse:collapse; width:100%; margin:1em 0; font-size:.92em; page-break-inside:avoid; }
+th, td { border:1px solid var(--line); padding:6px 9px; text-align:left; vertical-align:top; }
+th { background:#eef3f9; font-weight:600; }
+tr:nth-child(even) td { background:#fafbfc; }
+blockquote { margin:1em 0; padding:.6em 1em; border-left:4px solid #f0a500;
+             background:#fffbf0; color:#333; }
+blockquote p { margin:.3em 0; }
+hr { border:none; border-top:1px solid var(--line); margin:1.8em 0; }
+a { color:var(--accent); text-decoration:none; }
+.doc-header { font-size:.8em; color:var(--muted); margin-bottom:1.5em;
+              border-bottom:1px dashed var(--line); padding-bottom:.5em; }
+@media print {
+  body { padding:0; font-size:11.5px; }
+  pre { font-size:9.5px; }
+  h1 { font-size:1.5em; }
+  h2 { font-size:1.2em; }
+  @page { margin:14mm 12mm; }
+}
+</style>
+</head>
+<body>
+<div class="doc-header">Padroes de Projeto &mdash; Material de consulta para a prova &nbsp;|&nbsp; Prof. Escobar &nbsp;|&nbsp; gerado em 29/09/2026 18:57</div>
+<h1>REFERÊNCIA DE SINTAXE — Diagramas de Classe UML</h1>
+<blockquote><p>Use este arquivo quando a prova pedir o <strong>diagrama UML</strong> ("diagrama de classes UML completo"). Ele traz a notação oficial e o equivalente em Mermaid (renderiza no VS Code com a extensão <em>Markdown Preview Mermaid Support</em> e também no GitHub).</p></blockquote>
+<hr>
+<h2>1. O retângulo da classe (as 3 divisórias)</h2>
+<pre><code>
++---------------------------------------------+
+|            NomeDaClasse                     |  &lt;- 1) NOME
+|            &lt;&lt;interface&gt;&gt; / &lt;&lt;abstract&gt;&gt;     |     (estereótipo, se houver)
++---------------------------------------------+
+| - atributoPrivado : Tipo                    |  &lt;- 2) ATRIBUTOS
+| # atributoProtegido : Tipo                  |     (visibilidade + tipo)
+| + ATRIBUTO_CONSTANTE : double = 0.80        |
++---------------------------------------------+
+| + metodoPublico(param : Tipo) : Retorno     |  &lt;- 3) MÉTODOS
+| - metodoPrivado() : void                    |
+| + metodoAbstrato() : String  {abstract}     |
++---------------------------------------------+
+</code></pre>
+<h3>Visibilidade (símbolos)</h3>
+<table>
+<tr><th>Símbolo</th><th>Modificador Java</th><th>Significado</th></tr>
+<tr><td><code>+</code></td><td><code>public</code></td><td>visível a todos</td></tr>
+<tr><td><code>-</code></td><td><code>private</code></td><td>visível só na classe</td></tr>
+<tr><td><code>#</code></td><td><code>protected</code></td><td>visível na classe e nas filhas</td></tr>
+<tr><td><code>~</code></td><td><em>(default)</em></td><td>visível no pacote</td></tr>
+</table>
+<h3>Modificadores de método/atributo</h3>
+<table>
+<tr><th>Notação</th><th>Java</th></tr>
+<tr><td><code>{abstract}</code> ou nome em <em>itálico</em></td><td><code>abstract</code></td></tr>
+<tr><td><code>{static}</code> ou <strong>sublinhado</strong></td><td><code>static</code></td></tr>
+<tr><td><code>{final}</code></td><td><code>final</code></td></tr>
+<tr><td><code>&lt;&lt;interface&gt;&gt;</code></td><td><code>interface</code></td></tr>
+<tr><td><code>&lt;&lt;abstract&gt;&gt;</code></td><td><code>abstract class</code></td></tr>
+</table>
+<h3>Tipo e multiplicidade</h3>
+<pre><code>
+- nome : String
+- notas : List&lt;Double&gt;        →  escreve-se  List~Double~  em Mermaid
+- itens : Produto [0..*]       →  multiplicidade de associação
++ calcular(a : double, b : int) : double
+</code></pre>
+<hr>
+<h2>2. Relacionamentos (as setas)</h2>
+<table>
+<tr><th>Relação</th><th>UML (desenho)</th><th>Mermaid</th><th>Java correspondente</th></tr>
+<tr><td><strong>Generalização</strong> (herança)</td><td>linha cheia + <strong>triângulo vazado</strong> apontando para a base</td><td>`Base &lt;\</td><td>-- Filha`</td><td><code>class Filha extends Base</code></td></tr>
+<tr><td><strong>Realização</strong> (interface)</td><td>linha <strong>tracejada</strong> + <strong>triângulo vazado</strong></td><td>`Interface &lt;\</td><td>.. Classe`</td><td><code>class Classe implements Interface</code></td></tr>
+<tr><td><strong>Associação</strong></td><td>linha cheia (+ nome e multiplicidade)</td><td><code>A --&gt; B</code></td><td>atributo <code>B b;</code></td></tr>
+<tr><td><strong>Agregação</strong></td><td>linha cheia + <strong>losango vazado</strong> no "todo"</td><td><code>Todo o-- Parte</code></td><td>lista/atributo recebido de fora</td></tr>
+<tr><td><strong>Composição</strong></td><td>linha cheia + <strong>losango cheio</strong> no "todo"</td><td><code>Todo *-- Parte</code></td><td>atributo criado <strong>dentro</strong> (<code>new</code>)</td></tr>
+<tr><td><strong>Dependência</strong></td><td>linha <strong>tracejada</strong> + seta aberta</td><td><code>A ..&gt; B</code></td><td>uso pontual (parâmetro, local)</td></tr>
+</table>
+<h3>Regra prática para escolher entre Associação / Agregação / Composição</h3>
+<pre><code>
+A classe guarda um objeto B como atributo?
+
+├── B é criado DENTRO de A e não existe sem A ......... COMPOSIÇÃO  ( *-- )
+├── B é passado de fora e pode existir sozinho ....... AGREGAÇÃO   ( o-- )
+└── apenas conhece/usa B pontualmente ................ DEPENDÊNCIA ( ..&gt; )
+</code></pre>
+<hr>
+<h2>3. Diagramas prontos: os dois padrões mais prováveis</h2>
+<h3>3.1 Factory Method</h3>
+<pre><code>
+                        &lt;&lt;abstract&gt;&gt;
+                        +----------------------+
+                        |      Apolice         |
+                        +----------------------+
+                        | # numero : String    |
+                        | # segurado : String  |
+                        +----------------------+
+                        | + getPrefixo() : Str |
+                        | + calcularPremio()   |  {abstract}
+                        | + validarCobertura() |  {abstract}
+                        | + gerarResumo() : Str|
+                        +----------------------+
+                                  ^
+                +-----------------+------------------+
+                |                 |                  |
+        +---------------+ +---------------+ +---------------+
+        | ApoliceAuto   | | ApoliceVida   | | ApoliceViagem |
+        +---------------+ +---------------+ +---------------+
+                ^
+                |  (cria)
+        +-------------------------+
+        |   ApoliceAutoFactory    |
+        +-------------------------+
+        | + criarApolice():Apolice|    &lt;&lt;abstract&gt;&gt;
+        +-------------------------+   +-----------------------+
+                ^                     |   ApoliceFactory      |
+                |  herda              +-----------------------+
+                +---------------------| + criarApolice()      | {abstract}
+                                      | + processarContratacao| {final}
+                                      +-----------------------+
+                                                  ^
+                                                  |  usa
+                                      +-----------------------+
+                                      |   MainApolice         |
+                                      | + main(String[])      |
+                                      +-----------------------+
+</code></pre>
+<p>Mermaid equivalente:</p>
+<pre class="lang-mermaid"><code>
+classDiagram
+    direction TB
+    class Apolice {
+        &lt;&lt;abstract&gt;&gt;
+        #String numero
+        #String segurado
+        +getPrefixo()* String
+        +calcularPremio()* double
+        +validarCobertura()* String
+        +gerarResumo() String
+    }
+    class ApoliceAuto { +calcularPremio() double }
+    class ApoliceVida { +calcularPremio() double }
+    class ApoliceFactory {
+        &lt;&lt;abstract&gt;&gt;
+        +criarApolice()* Apolice
+        +processarContratacao() String
+    }
+    class ApoliceAutoFactory { +criarApolice() Apolice }
+    class MainApolice { +main(String[]) void }
+
+    Apolice &lt;|-- ApoliceAuto
+    Apolice &lt;|-- ApoliceVida
+    ApoliceFactory &lt;|-- ApoliceAutoFactory
+    ApoliceFactory ..&gt; Apolice : "método fábrica"
+    ApoliceAutoFactory ..&gt; ApoliceAuto : cria
+    MainApolice ..&gt; ApoliceFactory : escolhe o criador
+</code></pre>
+<h3>3.2 Abstract Factory</h3>
+<pre class="lang-mermaid"><code>
+classDiagram
+    direction TB
+    class CheckoutFactory {
+        &lt;&lt;interface&gt;&gt;
+        +criarDocumentoFiscal() DocumentoFiscal
+        +criarPagamento() Pagamento
+        +criarEtiqueta() EtiquetaEnvio
+    }
+    class CheckoutBrasilFactory
+    class DocumentoFiscal { &lt;&lt;interface&gt;&gt; +gerar() String }
+    class Pagamento { &lt;&lt;interface&gt;&gt; +processar() String }
+    class EtiquetaEnvio { &lt;&lt;interface&gt;&gt; +gerar() String }
+    class NotaFiscalEletronica
+    class PagamentoPix
+    class EtiquetaCorreios
+    class Checkout { +finalizarPedido(CheckoutFactory) String }
+
+    CheckoutFactory &lt;|.. CheckoutBrasilFactory
+    DocumentoFiscal &lt;|.. NotaFiscalEletronica
+    Pagamento &lt;|.. PagamentoPix
+    EtiquetaEnvio &lt;|.. EtiquetaCorreios
+    CheckoutBrasilFactory ..&gt; NotaFiscalEletronica : cria
+    CheckoutBrasilFactory ..&gt; PagamentoPix : cria
+    CheckoutBrasilFactory ..&gt; EtiquetaCorreios : cria
+    Checkout ..&gt; CheckoutFactory : "depende da abstração"
+</code></pre>
+<hr>
+<h2>4. Checklist do diagrama (o professor avalia "aderência à implementação")</h2>
+<ul>
+<li>[ ] <strong>Todas</strong> as classes do código aparecem no diagrama (inclusive o cliente).</li>
+<li>[ ] <strong>Nomes idênticos</strong> aos do código (não invente <code>ApoliceBase</code> se a classe é</li>
+</ul>
+<p>      <code>Apolice</code>).</p>
+<ul>
+<li>[ ] Estereótipos corretos: <code>&lt;&lt;abstract&gt;&gt;</code> na classe abstrata,</li>
+</ul>
+<p>      <code>&lt;&lt;interface&gt;&gt;</code> nas interfaces.</p>
+<ul>
+<li>[ ] Métodos abstratos marcados (<code>{abstract}</code> ou <em>itálico</em>).</li>
+<li>[ ] <strong>Método fábrica</strong> visível na hierarquia de criadores, com a seta de</li>
+</ul>
+<p>      dependência para o produto.</p>
+<ul>
+<li>[ ] Visibilidade correta (<code>#</code> para <code>protected</code> — erra muito!).</li>
+<li>[ ] <strong><code>final</code></strong> indicado no método de processamento.</li>
+<li>[ ] Cardinalidades nas associações (<code>"1"</code>, <code>"0..*"</code>).</li>
+<li>[ ] Se houver interface, use <strong>realização</strong> (tracejada), não generalização.</li>
+</ul>
+<hr>
+<h2>5. Diagrama de sequência (se a prova pedir o comportamento)</h2>
+<pre><code>
+Cliente        Criador            Produto
+   |              |                  |
+   |--processarContratacao()-------&gt;  |
+   |              |                  |
+   |              |--criarApolice()  |     &lt;&lt;método fábrica&gt;&gt;
+   |              |-----------------&gt;|  (subclasse instancia o concreto)
+   |              |&lt;-----------------|
+   |              |                  |
+   |              |--validarCobertura()------&gt;|
+   |              |&lt;--------------------------|
+   |              |--calcularPremio()--------&gt;|
+   |              |&lt;--------------------------|
+   |              |--gerarResumo()-----------&gt;|
+   |              |&lt;--------------------------|
+   |&lt;--resumo-----|                  |
+</code></pre>
+<p>Ideia-chave: o <strong>cliente só conversa com o criador</strong>; o criador só conversa com a</p>
+<p><strong>abstração do produto</strong>.</p>
+
+</body>
+</html>
